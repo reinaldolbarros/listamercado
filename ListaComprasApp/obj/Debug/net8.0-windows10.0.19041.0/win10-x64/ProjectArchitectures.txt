@@ -1,0 +1,1 @@
+C:\Users\reina\OneDrive\TI\Lista\ListaComprasApp\ListaComprasApp\ListaComprasApp.csproj;x64

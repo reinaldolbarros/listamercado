@@ -1,0 +1,311 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ListaComprasApp</name>
+    </assembly>
+    <members>
+        <member name="M:ListaComprasApp.Services.ProdutosPadraoService.ExcluirProduto(System.String)">
+            <summary>
+            Exclui um produto da lista de produtos padrão
+            </summary>
+            <param name="nomeProduto">Nome do produto a ser excluído</param>
+            <returns>True se o produto foi excluído com sucesso, False caso contrário</returns>
+        </member>
+        <member name="T:ListaComprasApp.ViewModels.BaseViewModel">
+            <inheritdoc/>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.BaseViewModel.IsBusy">
+            <inheritdoc cref="F:ListaComprasApp.ViewModels.BaseViewModel.isBusy"/>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.BaseViewModel.Title">
+            <inheritdoc cref="F:ListaComprasApp.ViewModels.BaseViewModel.title"/>
+        </member>
+        <member name="T:ListaComprasApp.ViewModels.ListaDetalhesViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.ListaAtual">
+            <inheritdoc cref="F:ListaComprasApp.ViewModels.ListaDetalhesViewModel.listaAtual"/>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.ListaId">
+            <inheritdoc cref="F:ListaComprasApp.ViewModels.ListaDetalhesViewModel.listaId"/>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.NomeItem">
+            <inheritdoc cref="F:ListaComprasApp.ViewModels.ListaDetalhesViewModel.nomeItem"/>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.ValorUnitario">
+            <inheritdoc cref="F:ListaComprasApp.ViewModels.ListaDetalhesViewModel.valorUnitario"/>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.Quantidade">
+            <inheritdoc cref="F:ListaComprasApp.ViewModels.ListaDetalhesViewModel.quantidade"/>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.UnidadeSelecionada">
+            <inheritdoc cref="F:ListaComprasApp.ViewModels.ListaDetalhesViewModel.unidadeSelecionada"/>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.CategoriaSelecionada">
+            <inheritdoc cref="F:ListaComprasApp.ViewModels.ListaDetalhesViewModel.categoriaSelecionada"/>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.UsarValorTotal">
+            <inheritdoc cref="F:ListaComprasApp.ViewModels.ListaDetalhesViewModel.usarValorTotal"/>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.ValorTotalManual">
+            <inheritdoc cref="F:ListaComprasApp.ViewModels.ListaDetalhesViewModel.valorTotalManual"/>
+        </member>
+        <member name="M:ListaComprasApp.ViewModels.ListaDetalhesViewModel.OnListaIdChanged(System.Int32)">
+            <summary>Executes the logic for when <see cref="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.ListaId"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.ListaId"/> is changed.</remarks>
+        </member>
+        <member name="M:ListaComprasApp.ViewModels.ListaDetalhesViewModel.OnNomeItemChanged(System.String)">
+            <summary>Executes the logic for when <see cref="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.NomeItem"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.NomeItem"/> is changed.</remarks>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.ListaDetalhesViewModel.carregarListaCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.CarregarListaCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.CarregarListaCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.ListaDetalhesViewModel.CarregarLista"/>.</summary>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.ListaDetalhesViewModel.adicionarItemCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.AdicionarItemCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.AdicionarItemCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.ListaDetalhesViewModel.AdicionarItem"/>.</summary>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.ListaDetalhesViewModel.marcarCompradoCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.MarcarCompradoCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.MarcarCompradoCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.ListaDetalhesViewModel.MarcarComprado(ListaComprasApp.Models.Item)"/>.</summary>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.ListaDetalhesViewModel.excluirItemCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.ExcluirItemCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.ExcluirItemCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.ListaDetalhesViewModel.ExcluirItem(ListaComprasApp.Models.Item)"/>.</summary>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.ListaDetalhesViewModel.abrirProdutosPadraoCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.AbrirProdutosPadraoCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.AbrirProdutosPadraoCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.ListaDetalhesViewModel.AbrirProdutosPadrao"/>.</summary>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.ListaDetalhesViewModel.finalizarCompraCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.FinalizarCompraCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ListaDetalhesViewModel.FinalizarCompraCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.ListaDetalhesViewModel.FinalizarCompra"/>.</summary>
+        </member>
+        <member name="T:ListaComprasApp.ViewModels.MainViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.MainViewModel.ListaSelecionada">
+            <inheritdoc cref="F:ListaComprasApp.ViewModels.MainViewModel.listaSelecionada"/>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.MainViewModel.carregarListasCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.MainViewModel.CarregarListasCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.MainViewModel.CarregarListasCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.MainViewModel.CarregarListas"/>.</summary>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.MainViewModel.criarNovaListaCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.MainViewModel.CriarNovaListaCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.MainViewModel.CriarNovaListaCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.MainViewModel.CriarNovaLista"/>.</summary>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.MainViewModel.editarListaCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.MainViewModel.EditarListaCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.MainViewModel.EditarListaCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.MainViewModel.EditarLista(ListaComprasApp.Models.ListaCompras)"/>.</summary>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.MainViewModel.excluirListaCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.MainViewModel.ExcluirListaCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.MainViewModel.ExcluirListaCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.MainViewModel.ExcluirLista(ListaComprasApp.Models.ListaCompras)"/>.</summary>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.MainViewModel.abrirListaCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.MainViewModel.AbrirListaCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.MainViewModel.AbrirListaCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.MainViewModel.AbrirLista(ListaComprasApp.Models.ListaCompras)"/>.</summary>
+        </member>
+        <member name="T:ListaComprasApp.ViewModels.ProdutosPadraoViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.ListaId">
+            <inheritdoc cref="F:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.listaId"/>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.Filtro">
+            <inheritdoc cref="F:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.filtro"/>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.CategoriaFiltro">
+            <inheritdoc cref="F:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.categoriaFiltro"/>
+        </member>
+        <member name="M:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.OnListaIdChanged(System.Int32)">
+            <summary>Executes the logic for when <see cref="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.ListaId"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.ListaId"/> is changed.</remarks>
+        </member>
+        <member name="M:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.OnFiltroChanged(System.String)">
+            <summary>Executes the logic for when <see cref="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.Filtro"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.Filtro"/> is changed.</remarks>
+        </member>
+        <member name="M:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.OnCategoriaFiltroChanged(System.Nullable{ListaComprasApp.Models.Categoria})">
+            <summary>Executes the logic for when <see cref="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.CategoriaFiltro"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.CategoriaFiltro"/> is changed.</remarks>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.criarListaPadraoCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.CriarListaPadraoCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.CriarListaPadraoCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.CriarListaPadrao"/>.</summary>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.carregarProdutosCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.CarregarProdutosCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.CarregarProdutosCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.CarregarProdutos"/>.</summary>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.filtrarProdutosCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.FiltrarProdutosCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.FiltrarProdutosCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.FiltrarProdutos"/>.</summary>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.adicionarProdutoCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.AdicionarProdutoCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.AdicionarProdutoCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.AdicionarProduto(ListaComprasApp.ViewModels.ProdutoPadrao)"/>.</summary>
+        </member>
+        <member name="F:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.limparFiltrosCommand">
+            <summary>The backing field for <see cref="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.LimparFiltrosCommand"/>.</summary>
+        </member>
+        <member name="P:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.LimparFiltrosCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:ListaComprasApp.ViewModels.ProdutosPadraoViewModel.LimparFiltros"/>.</summary>
+        </member>
+        <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs">
+            <summary>
+            A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instances
+            for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
+            </summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsBusy">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsBusy" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsNotBusy">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsNotBusy" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Title">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Title" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.ListaAtual">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "ListaAtual" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.ListaId">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "ListaId" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.NomeItem">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "NomeItem" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.ValorUnitario">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "ValorUnitario" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Quantidade">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Quantidade" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.UnidadeSelecionada">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "UnidadeSelecionada" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CategoriaSelecionada">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CategoriaSelecionada" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.UsarValorTotal">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "UsarValorTotal" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.ValorTotalManual">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "ValorTotalManual" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.ListaSelecionada">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "ListaSelecionada" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Filtro">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Filtro" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CategoriaFiltro">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CategoriaFiltro" generated properties.</summary>
+        </member>
+        <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs">
+            <summary>
+            A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instances
+            for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
+            </summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsBusy">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsBusy" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsNotBusy">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsNotBusy" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Title">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Title" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.ListaAtual">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "ListaAtual" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.ListaId">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "ListaId" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.NomeItem">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "NomeItem" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.ValorUnitario">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "ValorUnitario" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Quantidade">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Quantidade" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.UnidadeSelecionada">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "UnidadeSelecionada" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CategoriaSelecionada">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CategoriaSelecionada" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.UsarValorTotal">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "UsarValorTotal" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.ValorTotalManual">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "ValorTotalManual" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.ListaSelecionada">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "ListaSelecionada" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Filtro">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Filtro" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CategoriaFiltro">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CategoriaFiltro" generated properties.</summary>
+        </member>
+    </members>
+</doc>

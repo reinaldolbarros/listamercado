@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:ListaComprasApp.ViewModels"
+             x:Class="ListaComprasApp.Views.ProdutosPadraoPage"
+             x:DataType="viewmodels:ProdutosPadraoViewModel"
+             Title="Lista de Compras">
+
+    <ScrollView>
+        <StackLayout Padding="5">
+
+            <!-- Header -->
+            <Label Text="Lista de Compras Padrão"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,20" />
+
+            <!-- Frutas e Verduras -->
+            <Label Text="Frutas e Verduras"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   TextColor="Purple"
+                   Margin="0,15,0,5" />
+
+            <!-- ABACAXI -->
+            <Frame BackgroundColor="White" BorderColor="LightGray" CornerRadius="8" Padding="1" Margin="0,2">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <!-- Linha 1: Checkbox, Ícone, Nome, Preço -->
+                        <RowDefinition Height="Auto" />
+                        <!-- Linha 2: Campo valor e controles -->
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30" />
+                        <!-- Checkbox -->
+                        <ColumnDefinition Width="50" />
+                        <!-- Ícone -->
+                        <ColumnDefinition Width="*" />
+                        <!-- Nome -->
+                        <ColumnDefinition Width="80" />
+                        <!-- Preço -->
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Linha 1 -->
+                    <CheckBox Grid.Row="0" Grid.Column="0" VerticalOptions="Center" Margin="-10, 0, 0, 0"/>
+
+                    <Label Grid.Row="0" Grid.Column="1" 
+                           Text="🍍" 
+                           FontSize="24" 
+                           VerticalOptions="Center" />
+
+                    <StackLayout Grid.Row="0" Grid.Column="2" VerticalOptions="Center">
+                        <Label Text="ABACAXI" 
+                               FontSize="18" 
+                               FontAttributes="Bold" />
+                        <Label Text="un" 
+                               FontSize="12" 
+                               TextColor="Gray" />
+                    </StackLayout>
+
+                    <Label Grid.Row="0" Grid.Column="3" 
+                           Text="R$ 8,00" 
+                           FontSize="16" 
+                           FontAttributes="Bold" 
+                           TextColor="Green" 
+                           VerticalOptions="Center" 
+                           HorizontalTextAlignment="End" />
+
+                    <!-- Linha 2 -->
+                    <StackLayout Grid.Row="1" Grid.Column="2" 
+                                 Orientation="Horizontal" 
+                                 Margin="0,10,0,0">
+                        <Entry Placeholder="0,00" 
+                               Text="8,00" 
+                               FontSize="12" 
+                               Keyboard="Numeric" 
+                               WidthRequest="70" 
+                               HeightRequest="30" />
+
+                        <StackLayout Orientation="Horizontal" 
+                                     VerticalOptions="Center" 
+                                     Margin="2,0,0,0"
+                                     Spacing="5">
+                            <Button Text="-" 
+                                    FontSize="16" 
+                                    BackgroundColor="LightCoral" 
+                                    TextColor="White" 
+                                    WidthRequest="30" 
+                                    HeightRequest="30" 
+                                    CornerRadius="15" />
+                            <Label Text="1" 
+                                   FontSize="16" 
+                                   FontAttributes="Bold" 
+                                   VerticalOptions="Center" 
+                                   WidthRequest="30" 
+                                   HorizontalTextAlignment="Center" />
+                            <Button Text="+" 
+                                    FontSize="16" 
+                                    BackgroundColor="LightGreen" 
+                                    TextColor="White" 
+                                    WidthRequest="30" 
+                                    HeightRequest="30" 
+                                    CornerRadius="15" />
+                        </StackLayout>
+                    </StackLayout>
+                </Grid>
+            </Frame>
+
+            <!-- BANANA -->
+            <Frame BackgroundColor="White" BorderColor="LightGray" CornerRadius="8" Padding="15" Margin="0,2">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="50" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="80" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Linha 1 -->
+                    <CheckBox Grid.Row="0" Grid.Column="0" VerticalOptions="Center" />
+
+                    <Label Grid.Row="0" Grid.Column="1" 
+                           Text="🍌" 
+                           FontSize="24" 
+                           VerticalOptions="Center" />
+
+                    <StackLayout Grid.Row="0" Grid.Column="2" VerticalOptions="Center">
+                        <Label Text="BANANA" 
+                               FontSize="18" 
+                               FontAttributes="Bold" />
+                        <Label Text="kg" 
+                               FontSize="12" 
+                               TextColor="Gray" />
+                    </StackLayout>
+
+                    <Label Grid.Row="0" Grid.Column="3" 
+                           Text="R$ 4,50" 
+                           FontSize="16" 
+                           FontAttributes="Bold" 
+                           TextColor="Green" 
+                           VerticalOptions="Center" 
+                           HorizontalTextAlignment="End" />
+
+                    <!-- Linha 2 -->
+                    <StackLayout Grid.Row="1" Grid.Column="2" 
+                                 Orientation="Horizontal" 
+                                 Margin="0,10,0,0">
+                        <Entry Placeholder="0,00" 
+                               Text="4,50" 
+                               FontSize="12" 
+                               Keyboard="Numeric" 
+                               WidthRequest="70" 
+                               HeightRequest="30" />
+
+                        <StackLayout Orientation="Horizontal" 
+                                     VerticalOptions="Center" 
+                                     Margin="20,0,0,0"
+                                     Spacing="5">
+                            <Button Text="-" 
+                                    FontSize="16" 
+                                    BackgroundColor="LightCoral" 
+                                    TextColor="White" 
+                                    WidthRequest="30" 
+                                    HeightRequest="30" 
+                                    CornerRadius="15" />
+                            <Label Text="1" 
+                                   FontSize="16" 
+                                   FontAttributes="Bold" 
+                                   VerticalOptions="Center" 
+                                   WidthRequest="30" 
+                                   HorizontalTextAlignment="Center" />
+                            <Button Text="+" 
+                                    FontSize="16" 
+                                    BackgroundColor="LightGreen" 
+                                    TextColor="White" 
+                                    WidthRequest="30" 
+                                    HeightRequest="30" 
+                                    CornerRadius="15" />
+                        </StackLayout>
+                    </StackLayout>
+                </Grid>
+            </Frame>
+
+            <!-- Total -->
+            <Label Text="TOTAL: R$ 12,50" 
+                   FontSize="20" 
+                   FontAttributes="Bold" 
+                   TextColor="Green" 
+                   HorizontalOptions="Center" 
+                   Margin="0,20,0,0" />
+
+            <!-- Botões -->
+            <StackLayout Orientation="Horizontal" 
+                         HorizontalOptions="Center" 
+                         Margin="0,20,0,0">
+                <Button Text="Editar Lista" 
+                        FontSize="16" 
+                        BackgroundColor="Orange" 
+                        TextColor="White" 
+                        Margin="0,0,10,0" 
+                        CornerRadius="8" />
+                <Button Text="Finalizar Compra" 
+                        FontSize="16" 
+                        BackgroundColor="Green" 
+                        TextColor="White" 
+                        CornerRadius="8" />
+            </StackLayout>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

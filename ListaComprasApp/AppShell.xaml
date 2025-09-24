@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="ListaComprasApp.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:ListaComprasApp.Views"
+    Title="ListaComprasApp">
+
+    <!-- Definir a página inicial como ProdutosPadraoPage -->
+    <ShellContent
+        Title="Lista de Compras"
+        ContentTemplate="{DataTemplate local:ProdutosPadraoPage}"
+        Route="produtospadrao" />
+
+    <!-- Manter a rota para a página principal (se necessário acessar) -->
+    <ShellContent
+        Title="Listas"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="main"
+        FlyoutItemIsVisible="False" />
+
+    <!-- Manter a rota para a página de detalhes -->
+    <ShellContent
+        Title="Detalhes"
+        ContentTemplate="{DataTemplate local:ListaDetalhesPage}"
+        Route="listadetalhes"
+        FlyoutItemIsVisible="False" />
+
+    <!-- Você pode adicionar uma TabBar personalizada para os botões do rodapé, se necessário -->
+    <TabBar>
+        <Tab Title="Produtos" Icon="list.png">
+            <ShellContent
+                ContentTemplate="{DataTemplate local:ProdutosPadraoPage}" />
+        </Tab>
+        <Tab Title="Finalizar">
+            <ShellContent
+                Route="finalizar"
+                ContentTemplate="{DataTemplate local:ProdutosPadraoPage}" />
+        </Tab>
+    </TabBar>
+</Shell>
