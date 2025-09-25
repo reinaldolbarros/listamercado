@@ -36653,11 +36653,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\reina\\OneDrive\\TI\\Lista\\ListaComprasApp\\ListaComprasApp\\ListaComprasApp.csproj",
+      "projectUniqueName": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\ListaComprasApp.csproj",
       "projectName": "ListaComprasApp",
-      "projectPath": "C:\\Users\\reina\\OneDrive\\TI\\Lista\\ListaComprasApp\\ListaComprasApp\\ListaComprasApp.csproj",
+      "projectPath": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\ListaComprasApp.csproj",
       "packagesPath": "C:\\Users\\reina\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\reina\\OneDrive\\TI\\Lista\\ListaComprasApp\\ListaComprasApp\\obj\\",
+      "outputPath": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\obj\\",
       "projectStyle": "PackageReference",
       "crossTargeting": true,
       "fallbackFolders": [

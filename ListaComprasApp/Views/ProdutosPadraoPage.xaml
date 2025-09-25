@@ -9,13 +9,7 @@
     <ScrollView>
         <StackLayout Padding="5">
 
-            <!-- Header -->
-            <Label Text="Lista de Compras Padrão"
-                   FontSize="20"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center"
-                   Margin="0,0,0,20" />
-
+            
             <!-- Frutas e Verduras -->
             <Label Text="Frutas e Verduras"
                    FontSize="16"

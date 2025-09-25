@@ -44,16 +44,29 @@ public partial class ProdutosPadraoPage : ContentPage
         var scrollView = new ScrollView();
         var stackLayout = new StackLayout { Padding = 20 };
 
-        // Header da lista
-        var headerLabel = new Label
+        // NOVO: Botão para adicionar nova categoria
+        var adicionarCategoriaButton = new Button
         {
-            Text = "Lista de Compras Padrão",
-            FontSize = 20,
+            Text = "+ Novo produto",
+            FontSize = 16,
             FontAttributes = FontAttributes.Bold,
+            BackgroundColor = Colors.Purple,
+            TextColor = Colors.White,
+            CornerRadius = 8,
+            Margin = new Thickness(0, 0, 0, 0),
+            Padding = new Thickness(0, -1, 0, 0),
+            HeightRequest = 40,
+            WidthRequest = 140,
             HorizontalOptions = LayoutOptions.Center,
-            Margin = new Thickness(0, 0, 0, 0)
+            VerticalOptions = LayoutOptions.Center
+
         };
-        stackLayout.Children.Add(headerLabel);
+        adicionarCategoriaButton.Clicked += OnAdicionarCategoriaClicked;
+        stackLayout.Children.Add(adicionarCategoriaButton);
+
+        // Header da lista
+
+
 
         // Mostrar produtos como lista de compras
         var produtos = ProdutosPadraoService.ObterProdutosAtivos();
@@ -72,7 +85,22 @@ public partial class ProdutosPadraoPage : ContentPage
                 Categoria.Padaria => "Padaria",
                 Categoria.Congelados => "Congelados",
                 Categoria.Higiene => "Higiene",
-                _ => "Outros"
+                Categoria.AlimentosBasicos => "Alimentos Básicos",
+                Categoria.EnlatadosConservas => "Enlatados e Conservas",
+                Categoria.BiscoitosSnacks => "Biscoitos e Snacks",
+                Categoria.DocesSobremesas => "Doces e Sobremesas",
+                Categoria.TemperoCondimentos => "Temperos e Condimentos",
+                Categoria.CafesChas => "Cafés e Chás",
+                Categoria.BebeInfantil => "Bebê e Infantil",
+                Categoria.PetShop => "Pet Shop",
+                Categoria.UtilidadesDomesticas => "Utilidades Domésticas",
+                Categoria.Descartaveis => "Descartáveis",
+                Categoria.HortifrutiEspeciais => "Hortifruti Especiais",
+                Categoria.ComidasProntas => "Comidas Prontas",
+                Categoria.Farmacia => "Farmácia",
+                Categoria.FestasDecoracao => "Festas e Decoração",
+                
+                _ => "Outras"
             };
 
             var categoriaLabel = new Label
@@ -670,9 +698,362 @@ public partial class ProdutosPadraoPage : ContentPage
                 Content = null; // Força liberação dos recursos
                 CreateUI();
                 AtualizarTotalGeral();
-                
+
             }
-           
+
         }
+    }
+
+    // NOVOS MÉTODOS PARA ADICIONAR CATEGORIA
+
+    private async void OnAdicionarCategoriaClicked(object sender, EventArgs e)
+    {
+        var categoriaSelecionada = await MostrarPopupCategorias();
+
+        if (categoriaSelecionada.HasValue)
+        {
+            await Task.Delay(300);
+            await MostrarSelecaoProdutos(categoriaSelecionada.Value);
+        }
+    }
+    private async Task<Categoria?> MostrarPopupCategorias()
+    {
+        var tcs = new TaskCompletionSource<Categoria?>();
+
+        var popupPage = new ContentPage
+        {
+            BackgroundColor = Color.FromArgb("#80000000")
+        };
+
+        var frame = new Frame
+        {
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Fill,
+            Margin = new Thickness(20),
+            CornerRadius = 15,
+            Padding = 0,
+            HasShadow = true,
+            BackgroundColor = Colors.White
+        };
+
+        var mainGrid = new Grid
+        {
+            RowDefinitions =
+        {
+            new RowDefinition { Height = GridLength.Auto },
+            new RowDefinition { Height = new GridLength(1, GridUnitType.Star) },
+            new RowDefinition { Height = GridLength.Auto }
+        },
+            Padding = 20
+        };
+
+        var tituloLabel = new Label
+        {
+            Text = "Selecione uma categoria",
+            FontSize = 20,
+            FontAttributes = FontAttributes.Bold,
+            HorizontalOptions = LayoutOptions.Center,
+            Margin = new Thickness(0, 0, 0, 15)
+        };
+        mainGrid.Children.Add(tituloLabel);
+        Grid.SetRow(tituloLabel, 0);
+
+        var scrollView = new ScrollView { MaximumHeightRequest = 500 };
+        var categoriasStack = new StackLayout { Spacing = 10 };
+
+        var categorias = new List<(Categoria Categoria, string Nome, string Icone)>
+    {
+        (Categoria.FrutasVerduras, "Frutas e Verduras", "🍎"),
+        (Categoria.Carnes, "Carnes", "🥩"),
+        (Categoria.Laticinios, "Laticínios", "🥛"),
+        (Categoria.Bebidas, "Bebidas", "🥤"),
+        (Categoria.Limpeza, "Limpeza", "🧹"),
+        (Categoria.Padaria, "Padaria", "🍞"),
+        (Categoria.Congelados, "Congelados", "🧊"),
+        (Categoria.Higiene, "Higiene", "🧴"),
+        (Categoria.AlimentosBasicos, "Alimentos Básicos", "🍚"),
+        (Categoria.EnlatadosConservas, "Enlatados e Conservas", "🥫"),
+        (Categoria.BiscoitosSnacks, "Biscoitos e Snacks", "🍪"),
+        (Categoria.DocesSobremesas, "Doces e Sobremesas", "🍫"),
+        (Categoria.TemperoCondimentos, "Temperos e Condimentos", "🧂"),
+        (Categoria.CafesChas, "Cafés e Chás", "☕"),
+        (Categoria.BebeInfantil, "Bebê e Infantil", "🍼"),
+        (Categoria.PetShop, "Pet Shop", "🐕"),
+        (Categoria.UtilidadesDomesticas, "Utilidades Domésticas", "🥘"),
+        (Categoria.Descartaveis, "Descartáveis", "🥤"),
+        (Categoria.HortifrutiEspeciais, "Hortifruti Especiais", "🌿"),
+        (Categoria.ComidasProntas, "Comidas Prontas", "🍕"),
+        (Categoria.Farmacia, "Farmácia", "💊"),
+        (Categoria.FestasDecoracao, "Festas e Decoração", "🎉"),
+        (Categoria.Outras, "Outras", "📦")
+    };
+
+        foreach (var cat in categorias)
+        {
+            var itemFrame = new Frame
+            {
+                Padding = 15,
+                CornerRadius = 10,
+                HasShadow = false,
+                BorderColor = Colors.LightGray,
+                BackgroundColor = Colors.White
+            };
+
+            var categoriaCapturada = cat.Categoria;
+            var tapGesture = new TapGestureRecognizer();
+            tapGesture.Tapped += async (s, e) =>
+            {
+                tcs.TrySetResult(categoriaCapturada);
+                await Navigation.PopModalAsync();
+            };
+            itemFrame.GestureRecognizers.Add(tapGesture);
+
+            var itemGrid = new Grid
+            {
+                ColumnDefinitions =
+            {
+                new ColumnDefinition { Width = GridLength.Auto },
+                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }
+            }
+            };
+
+            var iconeLabel = new Label
+            {
+                Text = cat.Icone,
+                FontSize = 30,
+                VerticalOptions = LayoutOptions.Center
+            };
+            itemGrid.Children.Add(iconeLabel);
+            Grid.SetColumn(iconeLabel, 0);
+
+            var nomeLabel = new Label
+            {
+                Text = cat.Nome,
+                FontSize = 18,
+                VerticalOptions = LayoutOptions.Center,
+                Margin = new Thickness(15, 0, 0, 0)
+            };
+            itemGrid.Children.Add(nomeLabel);
+            Grid.SetColumn(nomeLabel, 1);
+
+            itemFrame.Content = itemGrid;
+            categoriasStack.Children.Add(itemFrame);
+        }
+
+        scrollView.Content = categoriasStack;
+        mainGrid.Children.Add(scrollView);
+        Grid.SetRow(scrollView, 1);
+
+        var cancelarButton = new Button
+        {
+            Text = "Cancelar",
+            BackgroundColor = Colors.Gray,
+            TextColor = Colors.White,
+            CornerRadius = 8,
+            Margin = new Thickness(0, 15, 0, 0)
+        };
+        cancelarButton.Clicked += async (s, e) =>
+        {
+            tcs.TrySetResult(null);
+            await Navigation.PopModalAsync();
+        };
+        mainGrid.Children.Add(cancelarButton);
+        Grid.SetRow(cancelarButton, 2);
+
+        frame.Content = mainGrid;
+        popupPage.Content = frame;
+
+        await Navigation.PushModalAsync(popupPage);
+
+        return await tcs.Task;
+    }
+    private string ObterNomeCategoria(Categoria categoria)
+    {
+        return categoria switch
+        {
+            Categoria.FrutasVerduras => "Frutas e Verduras",
+            Categoria.Carnes => "Carnes",
+            Categoria.Laticinios => "Laticínios",
+            Categoria.Bebidas => "Bebidas",
+            Categoria.Limpeza => "Limpeza",
+            Categoria.Padaria => "Padaria",
+            Categoria.Congelados => "Congelados",
+            Categoria.Higiene => "Higiene",
+            Categoria.Outras => "Outras",
+            _ => "Outros"
+        };
+    }
+
+    private async Task MostrarSelecaoProdutos(Categoria categoria)
+    {
+        var popupPage = new ContentPage
+        {
+            BackgroundColor = Color.FromArgb("#80000000")
+        };
+
+        var frame = new Frame
+        {
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Fill,
+            Margin = new Thickness(20),
+            CornerRadius = 15,
+            Padding = 0,
+            HasShadow = true,
+            BackgroundColor = Colors.White
+        };
+
+        var mainGrid = new Grid
+        {
+            RowDefinitions =
+        {
+            new RowDefinition { Height = GridLength.Auto },
+            new RowDefinition { Height = new GridLength(1, GridUnitType.Star) },
+            new RowDefinition { Height = GridLength.Auto }
+        },
+            Padding = 20
+        };
+
+        var tituloLabel = new Label
+        {
+            Text = $"Selecione um produto de {ObterNomeCategoria(categoria)}",
+            FontSize = 18,
+            FontAttributes = FontAttributes.Bold,
+            HorizontalOptions = LayoutOptions.Center,
+            Margin = new Thickness(0, 0, 0, 15),
+            LineBreakMode = LineBreakMode.WordWrap,
+            HorizontalTextAlignment = TextAlignment.Center
+        };
+        mainGrid.Children.Add(tituloLabel);
+        Grid.SetRow(tituloLabel, 0);
+
+        var scrollView = new ScrollView { MaximumHeightRequest = 500 };
+        var produtosStack = new StackLayout { Spacing = 10 };
+
+        var todosProdutos = ProdutosCatalogo.ObterProdutosPorCategoria();
+        var produtosDaCategoria = todosProdutos.ContainsKey(categoria)
+            ? todosProdutos[categoria]
+            : new List<(string, UnidadeMedida, string, decimal)>();
+
+        foreach (var produto in produtosDaCategoria)
+        {
+            var itemFrame = new Frame
+            {
+                Padding = 15,
+                CornerRadius = 10,
+                HasShadow = false,
+                BorderColor = Colors.LightGray,
+                BackgroundColor = Colors.White
+            };
+
+            var nomeProduto = produto.Item1;
+            var unidadeProduto = produto.Item2;
+            var iconeProduto = produto.Item3;
+            var precoProduto = produto.Item4;
+
+            var tapGesture = new TapGestureRecognizer();
+            tapGesture.Tapped += async (s, e) =>
+            {
+                ProdutosPadraoService.AdicionarProdutoPadrao(
+                    nomeProduto, unidadeProduto, categoria, iconeProduto, precoProduto);
+
+                await Navigation.PopModalAsync();
+                ReconstruirUI();
+            };
+            itemFrame.GestureRecognizers.Add(tapGesture);
+
+            var itemGrid = new Grid
+            {
+                ColumnDefinitions =
+            {
+                new ColumnDefinition { Width = GridLength.Auto },
+                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
+                new ColumnDefinition { Width = GridLength.Auto }
+            }
+            };
+
+            var iconeLabel = new Label
+            {
+                Text = produto.Item3,
+                FontSize = 30,
+                VerticalOptions = LayoutOptions.Center
+            };
+            itemGrid.Children.Add(iconeLabel);
+            Grid.SetColumn(iconeLabel, 0);
+
+            var detalhesStack = new StackLayout
+            {
+                VerticalOptions = LayoutOptions.Center,
+                Margin = new Thickness(15, 0, 0, 0),
+                Spacing = 2
+            };
+
+            var nomeLabel = new Label
+            {
+                Text = produto.Item1,
+                FontSize = 16,
+                FontAttributes = FontAttributes.Bold
+            };
+            detalhesStack.Children.Add(nomeLabel);
+
+            var unidadeTexto = produto.Item2 switch
+            {
+                UnidadeMedida.Kilo => "kg",
+                UnidadeMedida.Grama => "g",
+                UnidadeMedida.Litro => "L",
+                UnidadeMedida.Unidade => "un",
+                UnidadeMedida.Pacote => "pct",
+                UnidadeMedida.Caixa => "cx",
+                _ => "un"
+            };
+
+            var unidadeLabel = new Label
+            {
+                Text = unidadeTexto,
+                FontSize = 12,
+                TextColor = Colors.Gray
+            };
+            detalhesStack.Children.Add(unidadeLabel);
+
+            itemGrid.Children.Add(detalhesStack);
+            Grid.SetColumn(detalhesStack, 1);
+
+            var precoLabel = new Label
+            {
+                Text = string.Format(CultureInfo.GetCultureInfo("pt-BR"), "R$ {0:N2}", produto.Item4),
+                FontSize = 14,
+                FontAttributes = FontAttributes.Bold,
+                TextColor = Colors.Green,
+                VerticalOptions = LayoutOptions.Center
+            };
+            itemGrid.Children.Add(precoLabel);
+            Grid.SetColumn(precoLabel, 2);
+
+            itemFrame.Content = itemGrid;
+            produtosStack.Children.Add(itemFrame);
+        }
+
+        scrollView.Content = produtosStack;
+        mainGrid.Children.Add(scrollView);
+        Grid.SetRow(scrollView, 1);
+
+        var cancelarButton = new Button
+        {
+            Text = "Cancelar",
+            BackgroundColor = Colors.Gray,
+            TextColor = Colors.White,
+            CornerRadius = 8,
+            Margin = new Thickness(0, 15, 0, 0)
+        };
+        cancelarButton.Clicked += async (s, e) =>
+        {
+            await Navigation.PopModalAsync();
+        };
+        mainGrid.Children.Add(cancelarButton);
+        Grid.SetRow(cancelarButton, 2);
+
+        frame.Content = mainGrid;
+        popupPage.Content = frame;
+
+        await Navigation.PushModalAsync(popupPage);
     }
 }

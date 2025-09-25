@@ -56,7 +56,7 @@ namespace ListaComprasApp.Models
             Categoria.Padaria => "Padaria",
             Categoria.Congelados => "Congelados",
             Categoria.Higiene => "Higiene",
-            Categoria.Outros => "Outros",
+            Categoria.Outras => "Outras",
             _ => "Outros"
         };
 
