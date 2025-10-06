@@ -54,7 +54,7 @@ namespace ListaComprasApp.Services
             { "água", (UnidadeMedida.Litro, Categoria.Bebidas, "💧", 2.50m) },
             { "suco", (UnidadeMedida.Litro, Categoria.Bebidas, "🧃", 4.90m) },
             { "café", (UnidadeMedida.Pacote, Categoria.Bebidas, "☕", 8.50m) },
-            { "açúcar", (UnidadeMedida.Kilo, Categoria.Outras, "🍯", 4.20m) },
+            { "açúcar", (UnidadeMedida.Kilo, Categoria.ListaGeral, "🍯", 4.20m) },
             
             // Padaria
             { "pão", (UnidadeMedida.Unidade, Categoria.Padaria, "🍞", 0.50m) },
@@ -68,12 +68,12 @@ namespace ListaComprasApp.Services
             { "nuggets", (UnidadeMedida.Pacote, Categoria.Congelados, "🍗", 15.90m) },
             
             // Outros
-            { "arroz", (UnidadeMedida.Kilo, Categoria.Outras, "🍚", 6.50m) },
-            { "feijão", (UnidadeMedida.Kilo, Categoria.Outras, "🫘", 8.90m) },
-            { "macarrão", (UnidadeMedida.Pacote, Categoria.Outras, "🍝", 3.80m) },
-            { "óleo", (UnidadeMedida.Litro, Categoria.Outras, "🛢️", 7.50m) },
-            { "sal", (UnidadeMedida.Kilo, Categoria.Outras, "🧂", 2.20m) },
-            { "farinha", (UnidadeMedida.Kilo, Categoria.Outras, "🌾", 4.50m) }
+            { "arroz", (UnidadeMedida.Kilo, Categoria.ListaGeral, "🍚", 6.50m) },
+            { "feijão", (UnidadeMedida.Kilo, Categoria.ListaGeral, "🍲", 8.90m) },
+            { "macarrão", (UnidadeMedida.Pacote, Categoria.ListaGeral, "🍝", 3.80m) },
+            { "óleo", (UnidadeMedida.Litro, Categoria.ListaGeral, "🛢️", 7.50m) },
+            { "sal", (UnidadeMedida.Kilo, Categoria.ListaGeral, "🧂", 2.20m) },
+            { "farinha", (UnidadeMedida.Kilo, Categoria.ListaGeral, "🌾", 4.50m) }
         };
 
         public static (UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio) ObterPadrao(string nomeProduto)
@@ -84,7 +84,7 @@ namespace ListaComprasApp.Services
                 return ProdutosPadrao[produtoLower];
 
             // Se não encontrar, retorna padrão
-            return (UnidadeMedida.Unidade, Categoria.Outras, "📦", 0.00m);
+            return (UnidadeMedida.Unidade, Categoria.ListaGeral, "📦", 0.00m);
         }
 
         public static List<(string Nome, UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio)> ObterTodosProdutos()
@@ -248,6 +248,20 @@ namespace ListaComprasApp.Services
             return true;
         }
 
-       
+        public static bool AtualizarPrecoPadrao(string nome, decimal novoPreco)
+        {
+            var nomeLower = nome.ToLower().Trim();
+
+            if (ProdutosPadrao.ContainsKey(nomeLower))
+            {
+                var produto = ProdutosPadrao[nomeLower];
+                ProdutosPadrao[nomeLower] = (produto.Unidade, produto.Categoria, produto.Icone, novoPreco);
+                return true;
+            }
+
+            return false;
+        }
+
+
     }
 }

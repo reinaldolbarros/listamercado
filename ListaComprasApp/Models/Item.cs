@@ -48,6 +48,7 @@ namespace ListaComprasApp.Models
         [Ignore]
         public string CategoriaTexto => Categoria switch
         {
+            Categoria.ListaGeral => "Lista Geral(todos os produtos)",
             Categoria.FrutasVerduras => "Frutas e Verduras",
             Categoria.Carnes => "Carnes",
             Categoria.Laticinios => "Laticínios",
@@ -56,7 +57,6 @@ namespace ListaComprasApp.Models
             Categoria.Padaria => "Padaria",
             Categoria.Congelados => "Congelados",
             Categoria.Higiene => "Higiene",
-            Categoria.Outras => "Outras",
             _ => "Outros"
         };
 

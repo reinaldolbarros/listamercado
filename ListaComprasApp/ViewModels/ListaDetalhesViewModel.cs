@@ -32,7 +32,7 @@ namespace ListaComprasApp.ViewModels
         UnidadeMedida unidadeSelecionada = UnidadeMedida.Unidade;
 
         [ObservableProperty]
-        Categoria categoriaSelecionada = Categoria.Outras;
+        Categoria categoriaSelecionada = Categoria.ListaGeral;
 
         [ObservableProperty]
         bool usarValorTotal;

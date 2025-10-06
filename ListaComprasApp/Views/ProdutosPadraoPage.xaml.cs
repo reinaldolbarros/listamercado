@@ -11,40 +11,42 @@ public partial class ProdutosPadraoPage : ContentPage
     private readonly Dictionary<string, int> _quantidades = new();
     private readonly Dictionary<string, Entry> _valoresUnitarios = new();
     private readonly Dictionary<string, CheckBox> _checkboxes = new();
+    private Dictionary<string, bool> _checkboxStates = new();
     private Label _totalLabel;
     private Label _totalCheckadosLabel;
+    private ScrollView _scrollView;
+
+    // Dicionários para rastrear elementos visuais
+    private readonly Dictionary<string, View> _produtoContainers = new();
+    private readonly Dictionary<Categoria, (Label CategoriaLabel, StackLayout ProdutosStack)> _categoriasUI = new();
+    private StackLayout _mainStackLayout;
 
     public ProdutosPadraoPage(ProdutosPadraoViewModel viewModel)
     {
         _viewModel = viewModel;
         BindingContext = viewModel;
-
         Title = "Lista de Compras";
-
         CreateUI();
         LoadProducts();
     }
 
     private void CreateUI()
     {
-        // Definir cultura brasileira para toda a UI
         CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("pt-BR");
         CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("pt-BR");
 
-        // Grid principal para permitir um rodapé fixo
         var mainGrid = new Grid
         {
             RowDefinitions =
             {
-                new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }, // Conteúdo principal
-                new RowDefinition { Height = GridLength.Auto } // Barra de totais
+                new RowDefinition { Height = new GridLength(1, GridUnitType.Star) },
+                new RowDefinition { Height = GridLength.Auto }
             }
         };
 
-        var scrollView = new ScrollView();
-        var stackLayout = new StackLayout { Padding = 20 };
+        _scrollView = new ScrollView();
+        _mainStackLayout = new StackLayout { Padding = 20 };
 
-        // NOVO: Botão para adicionar nova categoria
         var adicionarCategoriaButton = new Button
         {
             Text = "+ Novo produto",
@@ -59,446 +61,18 @@ public partial class ProdutosPadraoPage : ContentPage
             WidthRequest = 140,
             HorizontalOptions = LayoutOptions.Center,
             VerticalOptions = LayoutOptions.Center
-
         };
         adicionarCategoriaButton.Clicked += OnAdicionarCategoriaClicked;
-        stackLayout.Children.Add(adicionarCategoriaButton);
+        _mainStackLayout.Children.Add(adicionarCategoriaButton);
 
-        // Header da lista
-
-
-
-        // Mostrar produtos como lista de compras
         var produtos = ProdutosPadraoService.ObterProdutosAtivos();
         var categorias = produtos.GroupBy(p => p.Categoria);
 
         foreach (var categoria in categorias)
         {
-            // Título da categoria
-            var categoriaTexto = categoria.Key switch
-            {
-                Categoria.FrutasVerduras => "Frutas e Verduras",
-                Categoria.Carnes => "Carnes",
-                Categoria.Laticinios => "Laticínios",
-                Categoria.Bebidas => "Bebidas",
-                Categoria.Limpeza => "Limpeza",
-                Categoria.Padaria => "Padaria",
-                Categoria.Congelados => "Congelados",
-                Categoria.Higiene => "Higiene",
-                Categoria.AlimentosBasicos => "Alimentos Básicos",
-                Categoria.EnlatadosConservas => "Enlatados e Conservas",
-                Categoria.BiscoitosSnacks => "Biscoitos e Snacks",
-                Categoria.DocesSobremesas => "Doces e Sobremesas",
-                Categoria.TemperoCondimentos => "Temperos e Condimentos",
-                Categoria.CafesChas => "Cafés e Chás",
-                Categoria.BebeInfantil => "Bebê e Infantil",
-                Categoria.PetShop => "Pet Shop",
-                Categoria.UtilidadesDomesticas => "Utilidades Domésticas",
-                Categoria.Descartaveis => "Descartáveis",
-                Categoria.HortifrutiEspeciais => "Hortifruti Especiais",
-                Categoria.ComidasProntas => "Comidas Prontas",
-                Categoria.Farmacia => "Farmácia",
-                Categoria.FestasDecoracao => "Festas e Decoração",
-                
-                _ => "Outras"
-            };
-
-            var categoriaLabel = new Label
-            {
-                Text = categoriaTexto,
-                FontSize = 16,
-                FontAttributes = FontAttributes.Bold,
-                TextColor = Colors.Purple,
-                Margin = new Thickness(0, 15, 0, 5)
-            };
-            stackLayout.Children.Add(categoriaLabel);
-
-            // Itens da categoria
-            foreach (var produto in categoria)
-            {
-                // Container externo que conterá o frame e o botão de exclusão
-                var itemContainer = new Grid
-                {
-                    ColumnDefinitions =
-                    {
-                        new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
-                        new ColumnDefinition { Width = GridLength.Auto }
-                    },
-                    Margin = new Thickness(0, 2)
-                };
-
-                var itemFrame = new Frame
-                {
-                    BackgroundColor = Colors.White,
-                    BorderColor = Colors.LightGray,
-                    CornerRadius = 8,
-                    Padding = new Thickness(5, 5, 4, 3),
-                    Margin = new Thickness(0),
-                    HeightRequest = 62
-
-                };
-
-                var itemGrid = new Grid
-                {
-                    ColumnDefinitions =
-                    {
-                        new ColumnDefinition { Width = GridLength.Auto }, // Checkbox 
-                        new ColumnDefinition { Width = GridLength.Auto }, // Ícone 
-                        new ColumnDefinition { Width = new GridLength(4, GridUnitType.Star) }, // Nome + detalhes
-                        new ColumnDefinition { Width = new GridLength(90, GridUnitType.Absolute) }, // Controles quantidade 
-                        new ColumnDefinition { Width = new GridLength(75, GridUnitType.Absolute) }  // Preço (aumentado para evitar quebras)
-                    }
-                };
-
-                // Checkbox
-                var checkbox = new CheckBox
-                {
-                    VerticalOptions = LayoutOptions.Center,
-                    HorizontalOptions = LayoutOptions.Center,
-                    Margin = new Thickness(-10, 0, 0, 0) // Margem negativa à esquerda para puxar mais para a borda
-                };
-                _checkboxes[produto.Nome] = checkbox;
-                checkbox.CheckedChanged += (s, e) => AtualizarTotalCheckados();
-                itemGrid.Children.Add(checkbox);
-                Grid.SetColumn(checkbox, 0);
-
-                // Ícone
-                var iconeLabel = new Label
-                {
-                    Text = produto.Icone,
-                    FontSize = 24,
-                    VerticalOptions = LayoutOptions.Center,
-                    HorizontalOptions = LayoutOptions.Center,
-                    Margin = new Thickness(-2, 0, 5, 0)
-                };
-                itemGrid.Children.Add(iconeLabel);
-                Grid.SetColumn(iconeLabel, 1);
-
-                // Inicializar quantidade para este produto
-                _quantidades[produto.Nome] = 1;
-
-                // Nome e detalhes
-                var detalhesStack = new StackLayout
-                {
-                    VerticalOptions = LayoutOptions.Start,
-                    HorizontalOptions = LayoutOptions.Start,
-                    Margin = new Thickness(5, 0, 10, 0),
-                    Spacing = 2
-                };
-
-                // Verificar se é palavra única ou composta
-                var nomeUpper = produto.Nome.ToUpper();
-                var temEspacos = nomeUpper.Contains(' ');
-
-                var nomeLabel = new Label
-                {
-                    Text = nomeUpper,
-                    FontSize = 14,
-                    FontAttributes = FontAttributes.Bold,
-                    LineBreakMode = temEspacos ? LineBreakMode.WordWrap : LineBreakMode.NoWrap,
-                    MaxLines = temEspacos ? 2 : 1, // Reduzido para no máximo 2 linhas,
-                    VerticalOptions = LayoutOptions.Start,
-                    HorizontalOptions = LayoutOptions.Start,
-                    WidthRequest = 120
-                };
-
-                // Ajustar fonte para palavras longas
-                if (nomeUpper.Length > 8) // Reduzido o limite para começar a diminuir a fonte mais cedo
-                {
-                    nomeLabel.FontSize = 12; // Fonte menor para palavras longas
-                }
-                if (nomeUpper.Length > 12) // Reduzido o limite para palavras muito longas
-                {
-                    nomeLabel.FontSize = 10; // Ainda menor para palavras muito longas
-                }
-                if (nomeUpper.Length > 18) // Caso extremo
-                {
-                    nomeLabel.FontSize = 9; // Fonte mínima para palavras extremamente longas
-                }
-                detalhesStack.Children.Add(nomeLabel);
-
-                var unidadeTexto = produto.Unidade switch
-                {
-                    UnidadeMedida.Kilo => "kg",
-                    UnidadeMedida.Grama => "g",
-                    UnidadeMedida.Litro => "L",
-                    UnidadeMedida.Unidade => "un",
-                    UnidadeMedida.Pacote => "pct",
-                    UnidadeMedida.Caixa => "cx",
-                    _ => "un"
-                };
-
-                // MODIFICAÇÃO: Unidade e quantidade em um layout horizontal
-                var unidadeQuantidadeStack = new StackLayout
-                {
-                    Orientation = StackOrientation.Horizontal,
-                    Spacing = 5
-                };
-
-                var detalhesLabel = new Label
-                {
-                    Text = unidadeTexto,
-                    FontSize = 10,
-                    TextColor = Colors.Gray,
-                    VerticalOptions = LayoutOptions.Center
-                };
-                unidadeQuantidadeStack.Children.Add(detalhesLabel);
-
-                // Adicionar a quantidade após a unidade
-                var quantidadeLabel = new Label
-                {
-                    Text = _quantidades[produto.Nome].ToString(),
-                    FontSize = 10,
-                    FontAttributes = FontAttributes.Bold,
-                    TextColor = Colors.Gray,
-                    VerticalOptions = LayoutOptions.Center
-                };
-                unidadeQuantidadeStack.Children.Add(quantidadeLabel);
-
-                // Adicionar o stack de unidade+quantidade ao stack de detalhes
-                detalhesStack.Children.Add(unidadeQuantidadeStack);
-
-                // Adicionar stack de detalhes ao grid
-                itemGrid.Children.Add(detalhesStack);
-                Grid.SetColumn(detalhesStack, 2);
-
-                // Criar label de preço com formatação de moeda brasileira
-                var precoLabel = new Label
-                {
-                    Text = string.Format(CultureInfo.GetCultureInfo("pt-BR"), "R$ {0:N2}", produto.PrecoMedio * _quantidades[produto.Nome]),
-                    FontSize = 14,
-                    FontAttributes = FontAttributes.Bold,
-                    TextColor = Colors.Green,
-                    VerticalOptions = LayoutOptions.Center,
-                    HorizontalTextAlignment = TextAlignment.End,
-                    Margin = new Thickness(0, 0, 0, 0),
-                };
-
-                // Campo de entrada para valor unitário
-                var valorEntry = new Entry
-                {
-                    Placeholder = "0,00",
-                    Text = produto.PrecoMedio.ToString("N2", CultureInfo.GetCultureInfo("pt-BR")),
-                    FontSize = 12,
-                    Keyboard = Keyboard.Numeric,
-                    WidthRequest = 65,
-                    HeightRequest = 50,
-                    HorizontalOptions = LayoutOptions.Center,
-                    VerticalOptions = LayoutOptions.Center, // Centralizado verticalmente
-                    HorizontalTextAlignment = TextAlignment.Center,
-                    Margin = new Thickness(0, -8, 0, 0) // Margem negativa no topo para subir o campo
-                };
-
-                // Armazenar referência do Entry
-                _valoresUnitarios[produto.Nome] = valorEntry;
-
-                // Capturar produto atual para uso nos eventos
-                var produtoAtual = produto;
-                var isUserInput = false;
-
-                // Selecionar todo o texto quando ganhar foco
-                valorEntry.Focused += (s, e) =>
-                {
-                    var entry = s as Entry;
-                    if (entry != null)
-                    {
-                        Device.BeginInvokeOnMainThread(() =>
-                        {
-                            entry.CursorPosition = 0;
-                            entry.SelectionLength = entry.Text?.Length ?? 0;
-                        });
-                    }
-                };
-
-                // Limpar seleção quando começar a digitar
-                valorEntry.TextChanged += (s, e) =>
-                {
-                    var entry = s as Entry;
-                    if (entry != null)
-                    {
-                        // Evitar processamento durante formatação automática
-                        if (isUserInput) return;
-                        isUserInput = true;
-
-                        // Remove caracteres não numéricos
-                        var numericText = new string(entry.Text.Where(char.IsDigit).ToArray());
-
-                        if (!string.IsNullOrEmpty(numericText))
-                        {
-                            // Converte para decimal considerando centavos
-                            if (long.TryParse(numericText, out long value))
-                            {
-                                var formattedValue = (decimal)value / 100;
-
-                                var expectedText = formattedValue.ToString("N2", CultureInfo.GetCultureInfo("pt-BR"));
-
-                                entry.Text = expectedText;
-                                entry.CursorPosition = expectedText.Length;
-
-                                // Atualiza o preço total do item
-                                var quantidade = _quantidades[produtoAtual.Nome];
-                                precoLabel.Text = string.Format(CultureInfo.GetCultureInfo("pt-BR"), "R$ {0:N2}", formattedValue * quantidade);
-                                AtualizarTotalGeral();
-                            }
-                        }
-                        else
-                        {
-                            entry.Text = "0,00";
-                            precoLabel.Text = "R$ 0,00";
-                            AtualizarTotalGeral();
-                        }
-
-                        isUserInput = false;
-                    }
-                };
-
-                // Container horizontal para o Entry e botões verticais
-                var quantidadeContainer = new StackLayout
-                {
-                    Orientation = StackOrientation.Horizontal,
-                    VerticalOptions = LayoutOptions.Center,
-                    HorizontalOptions = LayoutOptions.Start,
-                    Spacing = 5,
-                    Padding = new Thickness(0, 0, 0, 0)
-                };
-
-                // Adicionar o Entry à esquerda
-                quantidadeContainer.Children.Add(valorEntry);
-
-                // Container vertical para os botões
-                var botoesPlusMinusStack = new StackLayout
-                {
-                    Orientation = StackOrientation.Vertical,
-                    VerticalOptions = LayoutOptions.Center,
-                    HorizontalOptions = LayoutOptions.Start,
-                    Spacing = 2,
-                    Margin = new Thickness(0, 0, 0, 0)
-                };
-
-                // Botões de controle
-                var aumentarButton = new Button
-                {
-                    Text = "+",
-                    FontSize = 12,
-                    FontAttributes = FontAttributes.Bold,
-                    BackgroundColor = Colors.LightGreen,
-                    TextColor = Colors.White,
-                    WidthRequest = 24,
-                    HeightRequest = 24,
-                    CornerRadius = 10,
-                    Padding = 0
-                };
-
-                var diminuirButton = new Button
-                {
-                    Text = "-",
-                    FontSize = 12,
-                    FontAttributes = FontAttributes.Bold,
-                    BackgroundColor = Colors.LightCoral,
-                    TextColor = Colors.White,
-                    WidthRequest = 24,
-                    HeightRequest = 24,
-                    CornerRadius = 10,
-                    Padding = 0
-                };
-
-                // Função para obter valor unitário atual
-                decimal ObterValorUnitario()
-                {
-                    if (_valoresUnitarios.ContainsKey(produtoAtual.Nome))
-                    {
-                        var entry = _valoresUnitarios[produtoAtual.Nome];
-                        if (decimal.TryParse(entry.Text, out decimal valor))
-                            return valor;
-                    }
-                    return 0;
-                }
-
-                // Eventos dos botões
-                diminuirButton.Clicked += (s, e) =>
-                {
-                    if (_quantidades[produtoAtual.Nome] > 1)
-                    {
-                        _quantidades[produtoAtual.Nome]--;
-                        quantidadeLabel.Text = _quantidades[produtoAtual.Nome].ToString();
-                        var valorUnitario = ObterValorUnitario();
-                        precoLabel.Text = string.Format(CultureInfo.GetCultureInfo("pt-BR"), "R$ {0:N2}", valorUnitario * _quantidades[produtoAtual.Nome]);
-                        AtualizarTotalGeral();
-                    }
-                };
-
-                aumentarButton.Clicked += (s, e) =>
-                {
-                    _quantidades[produtoAtual.Nome]++;
-                    quantidadeLabel.Text = _quantidades[produtoAtual.Nome].ToString();
-                    var valorUnitario = ObterValorUnitario();
-                    precoLabel.Text = string.Format(CultureInfo.GetCultureInfo("pt-BR"), "R$ {0:N2}", valorUnitario * _quantidades[produtoAtual.Nome]);
-                    AtualizarTotalGeral();
-                };
-
-                // Adicionar os botões ao stack vertical
-                botoesPlusMinusStack.Children.Add(aumentarButton);
-                botoesPlusMinusStack.Children.Add(diminuirButton);
-
-                // Adicionar o stack de botões ao container horizontal
-                quantidadeContainer.Children.Add(botoesPlusMinusStack);
-
-                // Adicionar o container ao Grid
-                itemGrid.Children.Add(quantidadeContainer);
-                Grid.SetColumn(quantidadeContainer, 3);
-
-                // Container para preço
-                var precoStack = new StackLayout
-                {
-                    VerticalOptions = LayoutOptions.Center,
-                    HorizontalOptions = LayoutOptions.End,
-                    Spacing = 2
-                };
-
-                // Adicionar o preço
-                precoStack.Children.Add(precoLabel);
-
-                // Adicionar o stack de preço ao Grid
-                itemGrid.Children.Add(precoStack);
-                Grid.SetColumn(precoStack, 4);
-
-                // Configurar o conteúdo do frame
-                itemFrame.Content = itemGrid;
-
-                // Botão de exclusão (fora do frame)
-                var excluirButton = new Button
-                {
-                    Text = "×",
-                    FontSize = 18,
-                    FontAttributes = FontAttributes.Bold,
-                    BackgroundColor = Colors.Red,
-                    TextColor = Colors.White,
-                    WidthRequest = 30,
-                    HeightRequest = 30,
-                    CornerRadius = 15,
-                    Padding = 0,
-                    Margin = new Thickness(5, 0, 0, 0),
-                    VerticalOptions = LayoutOptions.Center,
-                    HorizontalOptions = LayoutOptions.End
-                };
-
-                // Capturar produto para o evento de exclusão
-                var produtoParaExcluir = produto;
-                excluirButton.Clicked += async (s, e) => await OnExcluirProdutoClicked(produtoParaExcluir);
-
-                // Adicionar o frame e o botão ao container
-                itemContainer.Children.Add(itemFrame);
-                Grid.SetColumn(itemFrame, 0);
-
-                itemContainer.Children.Add(excluirButton);
-                Grid.SetColumn(excluirButton, 1);
-
-                // Adicionar o container ao stackLayout principal
-                stackLayout.Children.Add(itemContainer);
-            }
+            CriarSecaoCategoria(categoria.Key, categoria.ToList());
         }
 
-        // Botões de ação
         var botoesStack = new StackLayout
         {
             Orientation = StackOrientation.Horizontal,
@@ -529,15 +103,12 @@ public partial class ProdutosPadraoPage : ContentPage
 
         botoesStack.Children.Add(editarButton);
         botoesStack.Children.Add(finalizarButton);
-        stackLayout.Children.Add(botoesStack);
+        _mainStackLayout.Children.Add(botoesStack);
 
-        scrollView.Content = stackLayout;
+        _scrollView.Content = _mainStackLayout;
+        mainGrid.Children.Add(_scrollView);
+        Grid.SetRow(_scrollView, 0);
 
-        // Adicionar ScrollView à primeira linha do Grid principal
-        mainGrid.Children.Add(scrollView);
-        Grid.SetRow(scrollView, 0);
-
-        // Criar a barra de totais
         var totaisFrame = new Frame
         {
             BackgroundColor = Colors.LightGray,
@@ -557,10 +128,9 @@ public partial class ProdutosPadraoPage : ContentPage
             }
         };
 
-        // Label para o TOTAL
         _totalLabel = new Label
         {
-            Text = string.Format(CultureInfo.GetCultureInfo("pt-BR"), "TOTAL PREVITSO:\nR$ {0:N2}", produtos.Sum(p => p.PrecoMedio)),
+            Text = string.Format(CultureInfo.GetCultureInfo("pt-BR"), "TOTAL PREVISTO:\nR$ {0:N2}", produtos.Sum(p => p.PrecoMedio)),
             FontSize = 16,
             FontAttributes = FontAttributes.Bold,
             TextColor = Colors.Green,
@@ -570,7 +140,6 @@ public partial class ProdutosPadraoPage : ContentPage
         totaisGrid.Children.Add(_totalLabel);
         Grid.SetColumn(_totalLabel, 0);
 
-        // Label para o TOTAL COMPRADO
         _totalCheckadosLabel = new Label
         {
             Text = "TOTAL COMPRADO:\nR$ 0,00",
@@ -583,31 +152,526 @@ public partial class ProdutosPadraoPage : ContentPage
         totaisGrid.Children.Add(_totalCheckadosLabel);
         Grid.SetColumn(_totalCheckadosLabel, 1);
 
-        // Inscrever-se nos eventos do gerenciador de totais
         TotaisManager.TotalChanged += (newText) => _totalLabel.Text = newText;
         TotaisManager.TotalCompradoChanged += (newText) => _totalCheckadosLabel.Text = newText;
 
         totaisFrame.Content = totaisGrid;
-
-        // Adicionar a barra de totais à segunda linha do Grid principal
         mainGrid.Children.Add(totaisFrame);
         Grid.SetRow(totaisFrame, 1);
 
-        // Definir o Grid principal como o conteúdo da página
         Content = mainGrid;
+
+        AtualizarTotalGeral();
+        AtualizarTotalCheckados();
+    }
+
+    private void CriarSecaoCategoria(Categoria categoria, List<(string Nome, UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio)> produtos)
+    {
+        var categoriaTexto = ObterTextoCategoria(categoria);
+
+        var categoriaLabel = new Label
+        {
+            Text = categoriaTexto,
+            FontSize = 16,
+            FontAttributes = FontAttributes.Bold,
+            TextColor = Colors.Purple,
+            Margin = new Thickness(0, 15, 0, 5)
+        };
+        _mainStackLayout.Children.Add(categoriaLabel);
+
+        var produtosStack = new StackLayout { Spacing = 2 };
+        _mainStackLayout.Children.Add(produtosStack);
+
+        _categoriasUI[categoria] = (categoriaLabel, produtosStack);
+
+        foreach (var produto in produtos)
+        {
+            AdicionarProdutoNaUI(produto, produtosStack);
+        }
+    }
+
+    private void AdicionarProdutoNaUI((string Nome, UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio) produto, StackLayout containerStack)
+    {
+        var itemContainer = new Grid
+        {
+            ColumnDefinitions =
+            {
+                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
+                new ColumnDefinition { Width = GridLength.Auto }
+            },
+            Margin = new Thickness(0, 2)
+        };
+
+        var itemFrame = new Frame
+        {
+            BackgroundColor = Colors.White,
+            BorderColor = Colors.LightGray,
+            CornerRadius = 8,
+            Padding = new Thickness(5, 5, 4, 3),
+            Margin = new Thickness(0),
+            HeightRequest = 62
+        };
+
+        var itemGrid = new Grid
+        {
+            ColumnDefinitions =
+            {
+                new ColumnDefinition { Width = GridLength.Auto },
+                new ColumnDefinition { Width = GridLength.Auto },
+                new ColumnDefinition { Width = new GridLength(4, GridUnitType.Star) },
+                new ColumnDefinition { Width = new GridLength(90, GridUnitType.Absolute) },
+                new ColumnDefinition { Width = new GridLength(75, GridUnitType.Absolute) }
+            }
+        };
+
+        var checkbox = new CheckBox
+        {
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Center,
+            Margin = new Thickness(-10, 0, 0, 0)
+        };
+
+        if (_checkboxStates.ContainsKey(produto.Nome))
+        {
+            checkbox.IsChecked = _checkboxStates[produto.Nome];
+        }
+
+        _checkboxes[produto.Nome] = checkbox;
+        checkbox.CheckedChanged += (s, e) =>
+        {
+            _checkboxStates[produto.Nome] = checkbox.IsChecked;
+            AtualizarTotalCheckados();
+        };
+        itemGrid.Children.Add(checkbox);
+        Grid.SetColumn(checkbox, 0);
+
+        var iconeLabel = new Label
+        {
+            Text = produto.Icone,
+            FontSize = 24,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Center,
+            Margin = new Thickness(-2, 0, 5, 0)
+        };
+        itemGrid.Children.Add(iconeLabel);
+        Grid.SetColumn(iconeLabel, 1);
+
+        if (!_quantidades.ContainsKey(produto.Nome))
+        {
+            _quantidades[produto.Nome] = 1;
+        }
+
+        var detalhesStack = new StackLayout
+        {
+            VerticalOptions = LayoutOptions.Start,
+            HorizontalOptions = LayoutOptions.Start,
+            Margin = new Thickness(5, 0, 10, 0),
+            Spacing = 2
+        };
+
+        var nomeUpper = produto.Nome.ToUpper();
+        var temEspacos = nomeUpper.Contains(' ');
+
+        var nomeLabel = new Label
+        {
+            Text = nomeUpper,
+            FontSize = 14,
+            FontAttributes = FontAttributes.Bold,
+            LineBreakMode = temEspacos ? LineBreakMode.WordWrap : LineBreakMode.NoWrap,
+            MaxLines = temEspacos ? 2 : 1,
+            VerticalOptions = LayoutOptions.Start,
+            HorizontalOptions = LayoutOptions.Start,
+            WidthRequest = 120
+        };
+
+        if (nomeUpper.Length > 8) nomeLabel.FontSize = 12;
+        if (nomeUpper.Length > 12) nomeLabel.FontSize = 10;
+        if (nomeUpper.Length > 18) nomeLabel.FontSize = 9;
+        detalhesStack.Children.Add(nomeLabel);
+
+        var unidadeTexto = produto.Unidade switch
+        {
+            UnidadeMedida.Kilo => "kg",
+            UnidadeMedida.Grama => "g",
+            UnidadeMedida.Litro => "L",
+            UnidadeMedida.Unidade => "un",
+            UnidadeMedida.Pacote => "pct",
+            UnidadeMedida.Caixa => "cx",
+            _ => "un"
+        };
+
+        var unidadeQuantidadeStack = new StackLayout
+        {
+            Orientation = StackOrientation.Horizontal,
+            Spacing = 5
+        };
+
+        var detalhesLabel = new Label
+        {
+            Text = unidadeTexto,
+            FontSize = 10,
+            TextColor = Colors.Gray,
+            VerticalOptions = LayoutOptions.Center
+        };
+        unidadeQuantidadeStack.Children.Add(detalhesLabel);
+
+        var quantidadeLabel = new Label
+        {
+            Text = _quantidades[produto.Nome].ToString(),
+            FontSize = 10,
+            FontAttributes = FontAttributes.Bold,
+            TextColor = Colors.Gray,
+            VerticalOptions = LayoutOptions.Center
+        };
+        unidadeQuantidadeStack.Children.Add(quantidadeLabel);
+
+        detalhesStack.Children.Add(unidadeQuantidadeStack);
+        itemGrid.Children.Add(detalhesStack);
+        Grid.SetColumn(detalhesStack, 2);
+
+        var precoLabel = new Label
+        {
+            Text = string.Format(CultureInfo.GetCultureInfo("pt-BR"), "R$ {0:N2}", produto.PrecoMedio * _quantidades[produto.Nome]),
+            FontSize = 14,
+            FontAttributes = FontAttributes.Bold,
+            TextColor = Colors.Green,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalTextAlignment = TextAlignment.End,
+            Margin = new Thickness(0, 0, 0, 0),
+        };
+
+        var valorEntry = new Entry
+        {
+            Placeholder = "0,00",
+            Text = produto.PrecoMedio.ToString("N2", CultureInfo.GetCultureInfo("pt-BR")),
+            FontSize = 12,
+            Keyboard = Keyboard.Numeric,
+            WidthRequest = 65,
+            HeightRequest = 50,
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalTextAlignment = TextAlignment.Center,
+            Margin = new Thickness(0, -8, 0, 0)
+        };
+
+        _valoresUnitarios[produto.Nome] = valorEntry;
+
+        var produtoAtual = produto;
+        var isUserInput = false;
+
+        valorEntry.Focused += (s, e) =>
+        {
+            var entry = s as Entry;
+            if (entry != null)
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    entry.CursorPosition = 0;
+                    entry.SelectionLength = entry.Text?.Length ?? 0;
+                });
+            }
+        };
+
+        valorEntry.TextChanged += (s, e) =>
+        {
+            var entry = s as Entry;
+            if (entry != null)
+            {
+                if (isUserInput) return;
+                isUserInput = true;
+
+                var numericText = new string(entry.Text.Where(char.IsDigit).ToArray());
+
+                if (!string.IsNullOrEmpty(numericText))
+                {
+                    if (long.TryParse(numericText, out long value))
+                    {
+                        var formattedValue = (decimal)value / 100;
+                        var expectedText = formattedValue.ToString("N2", CultureInfo.GetCultureInfo("pt-BR"));
+
+                        entry.Text = expectedText;
+                        entry.CursorPosition = expectedText.Length;
+
+                        var quantidade = _quantidades[produtoAtual.Nome];
+                        precoLabel.Text = string.Format(CultureInfo.GetCultureInfo("pt-BR"), "R$ {0:N2}", formattedValue * quantidade);
+                        AtualizarTotalGeral();
+                    }
+                }
+                else
+                {
+                    entry.Text = "0,00";
+                    precoLabel.Text = "R$ 0,00";
+                    AtualizarTotalGeral();
+                }
+
+                isUserInput = false;
+            }
+        };
+
+        var quantidadeContainer = new StackLayout
+        {
+            Orientation = StackOrientation.Horizontal,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Start,
+            Spacing = 5,
+            Padding = new Thickness(0, 0, 0, 0)
+        };
+
+        quantidadeContainer.Children.Add(valorEntry);
+
+        var botoesPlusMinusStack = new StackLayout
+        {
+            Orientation = StackOrientation.Vertical,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Start,
+            Spacing = 2,
+            Margin = new Thickness(0, 0, 0, 0)
+        };
+
+        var aumentarButton = new Button
+        {
+            Text = "+",
+            FontSize = 12,
+            FontAttributes = FontAttributes.Bold,
+            BackgroundColor = Colors.LightGreen,
+            TextColor = Colors.White,
+            WidthRequest = 24,
+            HeightRequest = 24,
+            CornerRadius = 10,
+            Padding = 0
+        };
+
+        var diminuirButton = new Button
+        {
+            Text = "-",
+            FontSize = 12,
+            FontAttributes = FontAttributes.Bold,
+            BackgroundColor = Colors.LightCoral,
+            TextColor = Colors.White,
+            WidthRequest = 24,
+            HeightRequest = 24,
+            CornerRadius = 10,
+            Padding = 0
+        };
+
+        decimal ObterValorUnitario()
+        {
+            if (_valoresUnitarios.ContainsKey(produtoAtual.Nome))
+            {
+                var entry = _valoresUnitarios[produtoAtual.Nome];
+                if (decimal.TryParse(entry.Text, out decimal valor))
+                    return valor;
+            }
+            return 0;
+        }
+
+        diminuirButton.Clicked += (s, e) =>
+        {
+            if (_quantidades[produtoAtual.Nome] > 1)
+            {
+                _quantidades[produtoAtual.Nome]--;
+                quantidadeLabel.Text = _quantidades[produtoAtual.Nome].ToString();
+                var valorUnitario = ObterValorUnitario();
+                precoLabel.Text = string.Format(CultureInfo.GetCultureInfo("pt-BR"), "R$ {0:N2}", valorUnitario * _quantidades[produtoAtual.Nome]);
+                AtualizarTotalGeral();
+            }
+        };
+
+        aumentarButton.Clicked += (s, e) =>
+        {
+            _quantidades[produtoAtual.Nome]++;
+            quantidadeLabel.Text = _quantidades[produtoAtual.Nome].ToString();
+            var valorUnitario = ObterValorUnitario();
+            precoLabel.Text = string.Format(CultureInfo.GetCultureInfo("pt-BR"), "R$ {0:N2}", valorUnitario * _quantidades[produtoAtual.Nome]);
+            AtualizarTotalGeral();
+        };
+
+        botoesPlusMinusStack.Children.Add(aumentarButton);
+        botoesPlusMinusStack.Children.Add(diminuirButton);
+        quantidadeContainer.Children.Add(botoesPlusMinusStack);
+
+        itemGrid.Children.Add(quantidadeContainer);
+        Grid.SetColumn(quantidadeContainer, 3);
+
+        var precoStack = new StackLayout
+        {
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.End,
+            Spacing = 2
+        };
+
+        precoStack.Children.Add(precoLabel);
+        itemGrid.Children.Add(precoStack);
+        Grid.SetColumn(precoStack, 4);
+
+        itemFrame.Content = itemGrid;
+
+        valorEntry.Unfocused += (s, e) =>
+        {
+            if (decimal.TryParse(valorEntry.Text, out decimal novoPreco))
+            {
+                ProdutosPadraoService.AtualizarPrecoPadrao(produtoAtual.Nome, novoPreco);
+            }
+        };
+
+        valorEntry.Completed += (s, e) =>
+        {
+            if (decimal.TryParse(valorEntry.Text, out decimal novoPreco))
+            {
+                ProdutosPadraoService.AtualizarPrecoPadrao(produtoAtual.Nome, novoPreco);
+            }
+            valorEntry.Unfocus();
+        };
+
+        var excluirButton = new Button
+        {
+            Text = "×",
+            FontSize = 18,
+            FontAttributes = FontAttributes.Bold,
+            BackgroundColor = Colors.Red,
+            TextColor = Colors.White,
+            WidthRequest = 30,
+            HeightRequest = 30,
+            CornerRadius = 15,
+            Padding = 0,
+            Margin = new Thickness(5, 0, 0, 0),
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.End
+        };
+
+        excluirButton.Clicked += async (s, e) => await RemoverProdutoDinamicamente(produtoAtual, itemContainer, containerStack);
+
+        itemContainer.Children.Add(itemFrame);
+        Grid.SetColumn(itemFrame, 0);
+
+        itemContainer.Children.Add(excluirButton);
+        Grid.SetColumn(excluirButton, 1);
+
+        containerStack.Children.Add(itemContainer);
+        _produtoContainers[produto.Nome] = itemContainer;
+    }
+
+    private async Task RemoverProdutoDinamicamente((string Nome, UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio) produto, View itemContainer, StackLayout containerStack)
+    {
+        // Criar overlay de loading
+        var loadingOverlay = new Grid
+        {
+            BackgroundColor = Color.FromArgb("#80000000"),
+            VerticalOptions = LayoutOptions.Fill,
+            HorizontalOptions = LayoutOptions.Fill
+        };
+
+        var loadingFrame = new Frame
+        {
+            BackgroundColor = Colors.White,
+            CornerRadius = 15,
+            Padding = 30,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Center,
+            HasShadow = true
+        };
+
+        var loadingStack = new StackLayout
+        {
+            Spacing = 10,
+            HorizontalOptions = LayoutOptions.Center
+        };
+         
+       
+        loadingFrame.Content = loadingStack;
+        loadingOverlay.Children.Add(loadingFrame);
+
+        var mainGrid = Content as Grid;
+        if (mainGrid != null)
+        {
+            mainGrid.Children.Add(loadingOverlay);
+            Grid.SetRowSpan(loadingOverlay, 2);
+        }
+
+        
+        // Executar exclusão no serviço
+        bool sucesso = ProdutosPadraoService.ExcluirProdutoPadrao(produto.Nome);
+
+        if (sucesso)
+        {
+            // Remover overlay
+            if (mainGrid != null)
+            {
+                mainGrid.Children.Remove(loadingOverlay);
+            }
+
+            // Animação de fade out
+            await itemContainer.FadeTo(0, 200);
+
+            // Remover da UI
+            containerStack.Children.Remove(itemContainer);
+
+            // Remover dos dicionários
+            _produtoContainers.Remove(produto.Nome);
+            _checkboxes.Remove(produto.Nome);
+            _checkboxStates.Remove(produto.Nome);
+            _quantidades.Remove(produto.Nome);
+            _valoresUnitarios.Remove(produto.Nome);
+
+            // Verificar se a categoria ficou vazia
+            if (containerStack.Children.Count == 0 && _categoriasUI.ContainsKey(produto.Categoria))
+            {
+                var (categoriaLabel, _) = _categoriasUI[produto.Categoria];
+
+                // Animar e remover o label da categoria
+                await categoriaLabel.FadeTo(0, 200);
+                _mainStackLayout.Children.Remove(categoriaLabel);
+                _mainStackLayout.Children.Remove(containerStack);
+
+                _categoriasUI.Remove(produto.Categoria);
+            }
+
+            // Atualizar totais
+            AtualizarTotalGeral();
+            AtualizarTotalCheckados();
+        }
+        else
+        {
+            // Remover overlay em caso de erro
+            if (mainGrid != null)
+            {
+                mainGrid.Children.Remove(loadingOverlay);
+            }
+        }
+    }
+
+    private string ObterTextoCategoria(Categoria categoria)
+    {
+        return categoria switch
+        {
+            Categoria.FrutasVerduras => "Frutas e Verduras",
+            Categoria.Carnes => "Carnes",
+            Categoria.Laticinios => "Laticínios",
+            Categoria.Bebidas => "Bebidas",
+            Categoria.Limpeza => "Limpeza",
+            Categoria.Padaria => "Padaria",
+            Categoria.Congelados => "Congelados",
+            Categoria.Higiene => "Higiene",
+            Categoria.AlimentosBasicos => "Alimentos Básicos",
+            Categoria.EnlatadosConservas => "Enlatados e Conservas",
+            Categoria.BiscoitosSnacks => "Biscoitos e Snacks",
+            Categoria.DocesSobremesas => "Doces e Sobremesas",
+            Categoria.TemperoCondimentos => "Temperos e Condimentos",
+            Categoria.CafesChas => "Cafés e Chás",
+            Categoria.BebeInfantil => "Bebê e Infantil",
+            Categoria.PetShop => "Pet Shop",
+            Categoria.UtilidadesDomesticas => "Utilidades Domésticas",
+            Categoria.Descartaveis => "Descartáveis",
+            Categoria.HortifrutiEspeciais => "Hortifruti Especiais",
+            Categoria.ComidasProntas => "Comidas Prontas",
+            Categoria.Farmacia => "Farmácia",
+            Categoria.FestasDecoracao => "Festas e Decoração",
+            _ => "Lista Geral(todos os produtos)"
+        };
     }
 
     private void LoadProducts()
     {
-        // Os produtos já são carregados na CreateUI
-    }
-
-    // Método para reconstruir a UI
-    private void ReconstruirUI()
-    {
-        Content = null; // Força liberação dos recursos
-        CreateUI();
-        AtualizarTotalGeral();
     }
 
     private async void OnEditarListaClicked(object sender, EventArgs e)
@@ -647,11 +711,6 @@ public partial class ProdutosPadraoPage : ContentPage
                 }
             }
         }
-
-        // Atualizar o total através do gerenciador
-        TotaisManager.UpdateTotal(totalGeral);
-
-        AtualizarTotalCheckados();
     }
 
     private void AtualizarTotalCheckados()
@@ -678,36 +737,16 @@ public partial class ProdutosPadraoPage : ContentPage
             }
         }
 
-        // Atualizar o total comprado através do gerenciador
         TotaisManager.UpdateTotalComprado(totalCheckados);
     }
 
-    private async Task OnExcluirProdutoClicked((string Nome, UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio) produto)
-    {
-        bool confirmar = await DisplayAlert(
-            "Confirmar exclusão",
-            $"Tem certeza que deseja excluir {produto.Nome}?",
-            "Sim", "Não");
-
-        if (confirmar)
-        {
-            bool sucesso = ProdutosPadraoService.ExcluirProdutoPadrao(produto.Nome);
-
-            if (sucesso)
-            {
-                Content = null; // Força liberação dos recursos
-                CreateUI();
-                AtualizarTotalGeral();
-
-            }
-
-        }
-    }
-
-    // NOVOS MÉTODOS PARA ADICIONAR CATEGORIA
-
     private async void OnAdicionarCategoriaClicked(object sender, EventArgs e)
     {
+        foreach (var kvp in _checkboxes)
+        {
+            _checkboxStates[kvp.Key] = kvp.Value.IsChecked;
+        }
+
         var categoriaSelecionada = await MostrarPopupCategorias();
 
         if (categoriaSelecionada.HasValue)
@@ -716,6 +755,7 @@ public partial class ProdutosPadraoPage : ContentPage
             await MostrarSelecaoProdutos(categoriaSelecionada.Value);
         }
     }
+
     private async Task<Categoria?> MostrarPopupCategorias()
     {
         var tcs = new TaskCompletionSource<Categoria?>();
@@ -739,11 +779,11 @@ public partial class ProdutosPadraoPage : ContentPage
         var mainGrid = new Grid
         {
             RowDefinitions =
-        {
-            new RowDefinition { Height = GridLength.Auto },
-            new RowDefinition { Height = new GridLength(1, GridUnitType.Star) },
-            new RowDefinition { Height = GridLength.Auto }
-        },
+            {
+                new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = new GridLength(1, GridUnitType.Star) },
+                new RowDefinition { Height = GridLength.Auto }
+            },
             Padding = 20
         };
 
@@ -762,31 +802,31 @@ public partial class ProdutosPadraoPage : ContentPage
         var categoriasStack = new StackLayout { Spacing = 10 };
 
         var categorias = new List<(Categoria Categoria, string Nome, string Icone)>
-    {
-        (Categoria.FrutasVerduras, "Frutas e Verduras", "🍎"),
-        (Categoria.Carnes, "Carnes", "🥩"),
-        (Categoria.Laticinios, "Laticínios", "🥛"),
-        (Categoria.Bebidas, "Bebidas", "🥤"),
-        (Categoria.Limpeza, "Limpeza", "🧹"),
-        (Categoria.Padaria, "Padaria", "🍞"),
-        (Categoria.Congelados, "Congelados", "🧊"),
-        (Categoria.Higiene, "Higiene", "🧴"),
-        (Categoria.AlimentosBasicos, "Alimentos Básicos", "🍚"),
-        (Categoria.EnlatadosConservas, "Enlatados e Conservas", "🥫"),
-        (Categoria.BiscoitosSnacks, "Biscoitos e Snacks", "🍪"),
-        (Categoria.DocesSobremesas, "Doces e Sobremesas", "🍫"),
-        (Categoria.TemperoCondimentos, "Temperos e Condimentos", "🧂"),
-        (Categoria.CafesChas, "Cafés e Chás", "☕"),
-        (Categoria.BebeInfantil, "Bebê e Infantil", "🍼"),
-        (Categoria.PetShop, "Pet Shop", "🐕"),
-        (Categoria.UtilidadesDomesticas, "Utilidades Domésticas", "🥘"),
-        (Categoria.Descartaveis, "Descartáveis", "🥤"),
-        (Categoria.HortifrutiEspeciais, "Hortifruti Especiais", "🌿"),
-        (Categoria.ComidasProntas, "Comidas Prontas", "🍕"),
-        (Categoria.Farmacia, "Farmácia", "💊"),
-        (Categoria.FestasDecoracao, "Festas e Decoração", "🎉"),
-        (Categoria.Outras, "Outras", "📦")
-    };
+        {
+            (Categoria.FrutasVerduras, "Frutas e Verduras", "🍎"),
+            (Categoria.Carnes, "Carnes", "🥩"),
+            (Categoria.Laticinios, "Laticínios", "🥛"),
+            (Categoria.Bebidas, "Bebidas", "🥤"),
+            (Categoria.Limpeza, "Limpeza", "🧹"),
+            (Categoria.Padaria, "Padaria", "🍞"),
+            (Categoria.Congelados, "Congelados", "🧊"),
+            (Categoria.Higiene, "Higiene", "🧴"),
+            (Categoria.AlimentosBasicos, "Alimentos Básicos", "🍚"),
+            (Categoria.EnlatadosConservas, "Enlatados e Conservas", "🥫"),
+            (Categoria.BiscoitosSnacks, "Biscoitos e Snacks", "🍪"),
+            (Categoria.DocesSobremesas, "Doces e Sobremesas", "🍫"),
+            (Categoria.TemperoCondimentos, "Temperos e Condimentos", "🧂"),
+            (Categoria.CafesChas, "Cafés e Chás", "☕"),
+            (Categoria.BebeInfantil, "Bebê e Infantil", "🍼"),
+            (Categoria.PetShop, "Pet Shop", "🐕"),
+            (Categoria.UtilidadesDomesticas, "Utilidades Domésticas", "🥘"),
+            (Categoria.Descartaveis, "Descartáveis", "🥤"),
+            (Categoria.HortifrutiEspeciais, "Hortifruti Especiais", "🌿"),
+            (Categoria.ComidasProntas, "Comidas Prontas", "🍕"),
+            (Categoria.Farmacia, "Farmácia", "💊"),
+            (Categoria.FestasDecoracao, "Festas e Decoração", "🎉"),
+            (Categoria.ListaGeral, "Lista Geral(todos os produtos)", "📦")
+        };
 
         foreach (var cat in categorias)
         {
@@ -811,10 +851,10 @@ public partial class ProdutosPadraoPage : ContentPage
             var itemGrid = new Grid
             {
                 ColumnDefinitions =
-            {
-                new ColumnDefinition { Width = GridLength.Auto },
-                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }
-            }
+                {
+                    new ColumnDefinition { Width = GridLength.Auto },
+                    new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }
+                }
             };
 
             var iconeLabel = new Label
@@ -867,10 +907,12 @@ public partial class ProdutosPadraoPage : ContentPage
 
         return await tcs.Task;
     }
+
     private string ObterNomeCategoria(Categoria categoria)
     {
         return categoria switch
         {
+            Categoria.ListaGeral => "Lista Geral(todos os produtos)",
             Categoria.FrutasVerduras => "Frutas e Verduras",
             Categoria.Carnes => "Carnes",
             Categoria.Laticinios => "Laticínios",
@@ -879,13 +921,17 @@ public partial class ProdutosPadraoPage : ContentPage
             Categoria.Padaria => "Padaria",
             Categoria.Congelados => "Congelados",
             Categoria.Higiene => "Higiene",
-            Categoria.Outras => "Outras",
             _ => "Outros"
         };
     }
 
     private async Task MostrarSelecaoProdutos(Categoria categoria)
     {
+        foreach (var kvp in _checkboxes)
+        {
+            _checkboxStates[kvp.Key] = kvp.Value.IsChecked;
+        }
+
         var popupPage = new ContentPage
         {
             BackgroundColor = Color.FromArgb("#80000000")
@@ -905,17 +951,17 @@ public partial class ProdutosPadraoPage : ContentPage
         var mainGrid = new Grid
         {
             RowDefinitions =
-        {
-            new RowDefinition { Height = GridLength.Auto },
-            new RowDefinition { Height = new GridLength(1, GridUnitType.Star) },
-            new RowDefinition { Height = GridLength.Auto }
-        },
+            {
+                new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = new GridLength(1, GridUnitType.Star) },
+                new RowDefinition { Height = GridLength.Auto }
+            },
             Padding = 20
         };
 
         var tituloLabel = new Label
         {
-            Text = $"Selecione um produto de {ObterNomeCategoria(categoria)}",
+            Text = $"Selecione um produto para {ObterNomeCategoria(categoria)}",
             FontSize = 18,
             FontAttributes = FontAttributes.Bold,
             HorizontalOptions = LayoutOptions.Center,
@@ -929,107 +975,34 @@ public partial class ProdutosPadraoPage : ContentPage
         var scrollView = new ScrollView { MaximumHeightRequest = 500 };
         var produtosStack = new StackLayout { Spacing = 10 };
 
-        var todosProdutos = ProdutosCatalogo.ObterProdutosPorCategoria();
-        var produtosDaCategoria = todosProdutos.ContainsKey(categoria)
-            ? todosProdutos[categoria]
-            : new List<(string, UnidadeMedida, string, decimal)>();
-
-        foreach (var produto in produtosDaCategoria)
+        if (categoria == Categoria.ListaGeral)
         {
-            var itemFrame = new Frame
-            {
-                Padding = 15,
-                CornerRadius = 10,
-                HasShadow = false,
-                BorderColor = Colors.LightGray,
-                BackgroundColor = Colors.White
-            };
+            var todosProdutos = ProdutosCatalogo.ObterProdutosPorCategoria();
+            List<(string Nome, UnidadeMedida Unidade, string Icone, decimal Preco)> todosProdutosLista = new();
 
-            var nomeProduto = produto.Item1;
-            var unidadeProduto = produto.Item2;
-            var iconeProduto = produto.Item3;
-            var precoProduto = produto.Item4;
-
-            var tapGesture = new TapGestureRecognizer();
-            tapGesture.Tapped += async (s, e) =>
+            foreach (var catProdutos in todosProdutos.Values)
             {
-                ProdutosPadraoService.AdicionarProdutoPadrao(
-                    nomeProduto, unidadeProduto, categoria, iconeProduto, precoProduto);
-
-                await Navigation.PopModalAsync();
-                ReconstruirUI();
-            };
-            itemFrame.GestureRecognizers.Add(tapGesture);
-
-            var itemGrid = new Grid
-            {
-                ColumnDefinitions =
-            {
-                new ColumnDefinition { Width = GridLength.Auto },
-                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
-                new ColumnDefinition { Width = GridLength.Auto }
+                todosProdutosLista.AddRange(catProdutos);
             }
-            };
 
-            var iconeLabel = new Label
+            todosProdutosLista = todosProdutosLista.OrderBy(p => p.Nome).ToList();
+
+            foreach (var produto in todosProdutosLista)
             {
-                Text = produto.Item3,
-                FontSize = 30,
-                VerticalOptions = LayoutOptions.Center
-            };
-            itemGrid.Children.Add(iconeLabel);
-            Grid.SetColumn(iconeLabel, 0);
+                CriarItemSelecaoProduto(produto.Nome, produto.Unidade, produto.Icone, produto.Preco, categoria, produtosStack);
+            }
+        }
+        else
+        {
+            var todosProdutos = ProdutosCatalogo.ObterProdutosPorCategoria();
+            var produtosDaCategoria = todosProdutos.ContainsKey(categoria)
+                ? todosProdutos[categoria]
+                : new List<(string, UnidadeMedida, string, decimal)>();
 
-            var detalhesStack = new StackLayout
+            foreach (var produto in produtosDaCategoria)
             {
-                VerticalOptions = LayoutOptions.Center,
-                Margin = new Thickness(15, 0, 0, 0),
-                Spacing = 2
-            };
-
-            var nomeLabel = new Label
-            {
-                Text = produto.Item1,
-                FontSize = 16,
-                FontAttributes = FontAttributes.Bold
-            };
-            detalhesStack.Children.Add(nomeLabel);
-
-            var unidadeTexto = produto.Item2 switch
-            {
-                UnidadeMedida.Kilo => "kg",
-                UnidadeMedida.Grama => "g",
-                UnidadeMedida.Litro => "L",
-                UnidadeMedida.Unidade => "un",
-                UnidadeMedida.Pacote => "pct",
-                UnidadeMedida.Caixa => "cx",
-                _ => "un"
-            };
-
-            var unidadeLabel = new Label
-            {
-                Text = unidadeTexto,
-                FontSize = 12,
-                TextColor = Colors.Gray
-            };
-            detalhesStack.Children.Add(unidadeLabel);
-
-            itemGrid.Children.Add(detalhesStack);
-            Grid.SetColumn(detalhesStack, 1);
-
-            var precoLabel = new Label
-            {
-                Text = string.Format(CultureInfo.GetCultureInfo("pt-BR"), "R$ {0:N2}", produto.Item4),
-                FontSize = 14,
-                FontAttributes = FontAttributes.Bold,
-                TextColor = Colors.Green,
-                VerticalOptions = LayoutOptions.Center
-            };
-            itemGrid.Children.Add(precoLabel);
-            Grid.SetColumn(precoLabel, 2);
-
-            itemFrame.Content = itemGrid;
-            produtosStack.Children.Add(itemFrame);
+                CriarItemSelecaoProduto(produto.Item1, produto.Item2, produto.Item3, produto.Item4, categoria, produtosStack);
+            }
         }
 
         scrollView.Content = produtosStack;
@@ -1055,5 +1028,119 @@ public partial class ProdutosPadraoPage : ContentPage
         popupPage.Content = frame;
 
         await Navigation.PushModalAsync(popupPage);
+    }
+
+    private void CriarItemSelecaoProduto(string nome, UnidadeMedida unidade, string icone, decimal preco, Categoria categoria, StackLayout produtosStack)
+    {
+        var itemFrame = new Frame
+        {
+            Padding = 15,
+            CornerRadius = 10,
+            HasShadow = false,
+            BorderColor = Colors.LightGray,
+            BackgroundColor = Colors.White
+        };
+
+        var nomeProduto = nome;
+        var unidadeProduto = unidade;
+        var iconeProduto = icone;
+        var precoProduto = preco;
+
+        var tapGesture = new TapGestureRecognizer();
+        tapGesture.Tapped += async (s, e) =>
+        {
+            ProdutosPadraoService.AdicionarProdutoPadrao(
+                nomeProduto, unidadeProduto, categoria, iconeProduto, precoProduto);
+
+            await Navigation.PopModalAsync();
+
+            // Adicionar produto dinamicamente sem reconstruir
+            var novoProduto = (nomeProduto, unidadeProduto, categoria, iconeProduto, precoProduto);
+
+            // Verificar se a categoria já existe
+            if (_categoriasUI.ContainsKey(categoria))
+            {
+                var (_, produtosStackCategoria) = _categoriasUI[categoria];
+                AdicionarProdutoNaUI(novoProduto, produtosStackCategoria);
+            }
+            else
+            {
+                // Criar nova seção de categoria
+                CriarSecaoCategoria(categoria, new List<(string, UnidadeMedida, Categoria, string, decimal)> { novoProduto });
+            }
+
+            AtualizarTotalGeral();
+        };
+        itemFrame.GestureRecognizers.Add(tapGesture);
+
+        var itemGrid = new Grid
+        {
+            ColumnDefinitions =
+            {
+                new ColumnDefinition { Width = GridLength.Auto },
+                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
+                new ColumnDefinition { Width = GridLength.Auto }
+            }
+        };
+
+        var iconeLabel = new Label
+        {
+            Text = icone,
+            FontSize = 30,
+            VerticalOptions = LayoutOptions.Center
+        };
+        itemGrid.Children.Add(iconeLabel);
+        Grid.SetColumn(iconeLabel, 0);
+
+        var detalhesStack = new StackLayout
+        {
+            VerticalOptions = LayoutOptions.Center,
+            Margin = new Thickness(15, 0, 0, 0),
+            Spacing = 2
+        };
+
+        var nomeLabel = new Label
+        {
+            Text = nome,
+            FontSize = 16,
+            FontAttributes = FontAttributes.Bold
+        };
+        detalhesStack.Children.Add(nomeLabel);
+
+        var unidadeTexto = unidade switch
+        {
+            UnidadeMedida.Kilo => "kg",
+            UnidadeMedida.Grama => "g",
+            UnidadeMedida.Litro => "L",
+            UnidadeMedida.Unidade => "un",
+            UnidadeMedida.Pacote => "pct",
+            UnidadeMedida.Caixa => "cx",
+            _ => "un"
+        };
+
+        var unidadeLabel = new Label
+        {
+            Text = unidadeTexto,
+            FontSize = 12,
+            TextColor = Colors.Gray
+        };
+        detalhesStack.Children.Add(unidadeLabel);
+
+        itemGrid.Children.Add(detalhesStack);
+        Grid.SetColumn(detalhesStack, 1);
+
+        var precoLabel = new Label
+        {
+            Text = string.Format(CultureInfo.GetCultureInfo("pt-BR"), "R$ {0:N2}", preco),
+            FontSize = 14,
+            FontAttributes = FontAttributes.Bold,
+            TextColor = Colors.Green,
+            VerticalOptions = LayoutOptions.Center
+        };
+        itemGrid.Children.Add(precoLabel);
+        Grid.SetColumn(precoLabel, 2);
+
+        itemFrame.Content = itemGrid;
+        produtosStack.Children.Add(itemFrame);
     }
 }

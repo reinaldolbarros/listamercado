@@ -25,6 +25,6 @@
         Farmacia,                // NOVO
         FestasDecoracao,         // NOVO
         UtilidadesDomestivas,
-        Outras
+        ListaGeral
     }
 }
