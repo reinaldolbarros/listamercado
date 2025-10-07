@@ -4,13 +4,6 @@
         <name>ListaComprasApp</name>
     </assembly>
     <members>
-        <member name="M:ListaComprasApp.Services.ProdutosPadraoService.ExcluirProduto(System.String)">
-            <summary>
-            Exclui um produto da lista de produtos padrão
-            </summary>
-            <param name="nomeProduto">Nome do produto a ser excluído</param>
-            <returns>True se o produto foi excluído com sucesso, False caso contrário</returns>
-        </member>
         <member name="T:ListaComprasApp.ViewModels.BaseViewModel">
             <inheritdoc/>
         </member>

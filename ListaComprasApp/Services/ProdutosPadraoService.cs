@@ -5,6 +5,7 @@ namespace ListaComprasApp.Services
 {
     public static class ProdutosPadraoService
     {
+        // Dicionário com os produtos padrão do sistema
         public static Dictionary<string, (UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio)> ProdutosPadrao = new()
         {
             // Frutas e Verduras
@@ -76,192 +77,108 @@ namespace ListaComprasApp.Services
             { "farinha", (UnidadeMedida.Kilo, Categoria.ListaGeral, "🌾", 4.50m) }
         };
 
+        // Método estático para inicialização
+        static ProdutosPadraoService()
+        {
+            // Inicializar o serviço de produtos personalizados para garantir que os dados são carregados
+            ProdutosPersonalizadosService.CarregarDados();
+        }
+
+        // Obter informações de um produto a partir do nome
         public static (UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio) ObterPadrao(string nomeProduto)
         {
             var produtoLower = nomeProduto.ToLower().Trim();
 
+            // Verificar se existe nos produtos padrão
             if (ProdutosPadrao.ContainsKey(produtoLower))
-                return ProdutosPadrao[produtoLower];
+            {
+                var produto = ProdutosPadrao[produtoLower];
+
+                // Verificar se existe um preço personalizado
+                var precoPersonalizado = ProdutosPersonalizadosService.ObterPrecoPersonalizado(produtoLower);
+                if (precoPersonalizado.HasValue)
+                {
+                    return (produto.Unidade, produto.Categoria, produto.Icone, precoPersonalizado.Value);
+                }
+
+                return produto;
+            }
+
+            // Verificar se existe nos produtos adicionados pelo usuário
+            var produtosPersonalizados = ProdutosPersonalizadosService.ObterProdutosPersonalizados();
+            var produtoPersonalizado = produtosPersonalizados.FirstOrDefault(p => p.Nome.ToLower() == produtoLower);
+
+            if (produtoPersonalizado != default)
+            {
+                return (produtoPersonalizado.Unidade, produtoPersonalizado.Categoria, produtoPersonalizado.Icone, produtoPersonalizado.PrecoMedio);
+            }
 
             // Se não encontrar, retorna padrão
             return (UnidadeMedida.Unidade, Categoria.ListaGeral, "📦", 0.00m);
         }
 
+        // Obter todos os produtos (padrão + personalizados)
         public static List<(string Nome, UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio)> ObterTodosProdutos()
         {
-            return ProdutosPadrao.Select(p => (
-                Nome: p.Key,
-                Unidade: p.Value.Unidade,
-                Categoria: p.Value.Categoria,
-                Icone: p.Value.Icone,
-                PrecoMedio: p.Value.PrecoMedio
-            )).OrderBy(p => p.Categoria).ThenBy(p => p.Nome).ToList();
+            var todosProdutos = new List<(string Nome, UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio)>();
+
+            // Adicionar produtos padrão
+            foreach (var produto in ProdutosPadrao)
+            {
+                var preco = produto.Value.PrecoMedio;
+                var precoPersonalizado = ProdutosPersonalizadosService.ObterPrecoPersonalizado(produto.Key);
+
+                if (precoPersonalizado.HasValue)
+                {
+                    preco = precoPersonalizado.Value;
+                }
+
+                todosProdutos.Add((
+                    Nome: produto.Key,
+                    Unidade: produto.Value.Unidade,
+                    Categoria: produto.Value.Categoria,
+                    Icone: produto.Value.Icone,
+                    PrecoMedio: preco
+                ));
+            }
+
+            // Adicionar produtos personalizados
+            var produtosPersonalizados = ProdutosPersonalizadosService.ObterProdutosPersonalizados();
+            todosProdutos.AddRange(produtosPersonalizados);
+
+            return todosProdutos.OrderBy(p => p.Categoria).ThenBy(p => p.Nome).ToList();
         }
 
+        // Obter produtos por categoria
         public static List<(string Nome, UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio)> ObterProdutosPorCategoria(Categoria categoria)
         {
-            return ProdutosPadrao.Where(p => p.Value.Categoria == categoria)
-                .Select(p => (
-                    Nome: p.Key,
-                    Unidade: p.Value.Unidade,
-                    Categoria: p.Value.Categoria,
-                    Icone: p.Value.Icone,
-                    PrecoMedio: p.Value.PrecoMedio
-                )).OrderBy(p => p.Nome).ToList();
+            return ObterTodosProdutos().Where(p => p.Categoria == categoria).OrderBy(p => p.Nome).ToList();
         }
 
-        // No ProdutosPadraoService.cs
-        private static List<string> _produtosPadraoExcluidos = new();
-
-        // Excluir um produto padrão
-        public static bool ExcluirProdutoPadrao(string nomeProduto)
-        {
-            if (!_produtosPadraoExcluidos.Contains(nomeProduto))
-            {
-                _produtosPadraoExcluidos.Add(nomeProduto);
-                SalvarProdutosExcluidos();
-                return true;
-            }
-            return false;
-        }
-
-        // Método para salvar produtos excluídos
-        private static void SalvarProdutosExcluidos()
-        {
-            try
-            {
-                string json = System.Text.Json.JsonSerializer.Serialize(_produtosPadraoExcluidos);
-                Preferences.Set("ProdutosPadraoExcluidos", json);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Erro ao salvar produtos excluídos: {ex.Message}");
-            }
-        }
-
-        // Método para carregar produtos excluídos
-        private static void CarregarProdutosExcluidos()
-        {
-            try
-            {
-                string json = Preferences.Get("ProdutosPadraoExcluidos", "");
-                if (!string.IsNullOrEmpty(json))
-                {
-                    var excluidos = System.Text.Json.JsonSerializer.Deserialize<List<string>>(json);
-                    if (excluidos != null)
-                        _produtosPadraoExcluidos = excluidos;
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Erro ao carregar produtos excluídos: {ex.Message}");
-            }
-        }
-
-        // Modificar o método ObterTodosProdutos para filtrar produtos excluídos
+        // Obter produtos ativos (excluindo os marcados como excluídos)
         public static List<(string Nome, UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio)> ObterProdutosAtivos()
         {
-            var produtosAtivos = new List<(string Nome, UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio)>();
-
-            foreach (var produto in ObterTodosProdutos())
-            {
-                if (!_produtosPadraoExcluidos.Contains(produto.Nome))
-                {
-                    produtosAtivos.Add(produto);
-                }
-            }
-
-            return produtosAtivos;
+            return ObterTodosProdutos()
+                .Where(p => !ProdutosPersonalizadosService.EstaProdutoExcluido(p.Nome))
+                .ToList();
         }
-        // Método para excluir um produto
-        /// <summary>
-        /// Exclui um produto da lista de produtos padrão
-        /// </summary>
-        /// <param name="nomeProduto">Nome do produto a ser excluído</param>
-        /// <returns>True se o produto foi excluído com sucesso, False caso contrário</returns>
-        public static bool ExcluirProduto(string nomeProduto)
+
+        // Excluir um produto
+        public static bool ExcluirProdutoPadrao(string nomeProduto)
         {
-            try
-            {
-                // Obter a lista atual de produtos
-                var produtos = ObterTodosProdutos().ToList();
-
-                // Verificar se a lista está vazia
-                if (produtos == null || produtos.Count == 0)
-                    return false;
-
-                // Encontrar o índice do produto a ser removido
-                int indice = -1;
-                for (int i = 0; i < produtos.Count; i++)
-                {
-                    if (produtos[i].Nome.Equals(nomeProduto, StringComparison.OrdinalIgnoreCase))
-                    {
-                        indice = i;
-                        break;
-                    }
-                }
-
-                // Se encontrou o produto, remova-o
-                if (indice >= 0)
-                {
-                    produtos.RemoveAt(indice);
-
-                    // Salvar a lista atualizada
-                    string json = System.Text.Json.JsonSerializer.Serialize(produtos);
-                    Preferences.Set("ProdutosPadrao", json);
-
-                    return true;
-                }
-
-                return false;
-            }
-            catch (Exception ex)
-            {
-                // Registrar o erro, se ocorrer
-                System.Diagnostics.Debug.WriteLine($"Erro ao excluir produto: {ex.Message}");
-                return false;
-            }
+            return ProdutosPersonalizadosService.ExcluirProduto(nomeProduto);
         }
 
-        // Método para salvar a lista atualizada
-        private static void SalvarListaProdutos(List<(string Nome, UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio)> produtos)
-        {
-            // Implementar conforme sua lógica de persistência
-            // Exemplo:
-            // string json = System.Text.Json.JsonSerializer.Serialize(produtos);
-            // Preferences.Set("ProdutosPadrao", json);
-        }
-
+        // Adicionar um produto padrão
         public static bool AdicionarProdutoPadrao(string nome, UnidadeMedida unidade, Categoria categoria, string icone, decimal precoMedio)
         {
-            var nomeLower = nome.ToLower().Trim();
-
-            // Verificar se já existe
-            if (ProdutosPadrao.ContainsKey(nomeLower))
-            {
-                return false; // Já existe
-            }
-
-            // Adicionar novo produto ao Dictionary
-            ProdutosPadrao.Add(nomeLower, (unidade, categoria, icone, precoMedio));
-
-            return true;
+            return ProdutosPersonalizadosService.AdicionarProduto(nome, unidade, categoria, icone, precoMedio);
         }
 
+        // Atualizar o preço médio de um produto
         public static bool AtualizarPrecoPadrao(string nome, decimal novoPreco)
         {
-            var nomeLower = nome.ToLower().Trim();
-
-            if (ProdutosPadrao.ContainsKey(nomeLower))
-            {
-                var produto = ProdutosPadrao[nomeLower];
-                ProdutosPadrao[nomeLower] = (produto.Unidade, produto.Categoria, produto.Icone, novoPreco);
-                return true;
-            }
-
-            return false;
+            return ProdutosPersonalizadosService.AtualizarPrecoProduto(nome, novoPreco);
         }
-
-
     }
 }
