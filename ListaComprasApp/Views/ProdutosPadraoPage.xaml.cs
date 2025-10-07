@@ -21,11 +21,16 @@ public partial class ProdutosPadraoPage : ContentPage
     private readonly Dictionary<Categoria, (Label CategoriaLabel, StackLayout ProdutosStack)> _categoriasUI = new();
     private StackLayout _mainStackLayout;
 
+    // Controle de navegação de meses
+    private DateTime _mesAtual = DateTime.Now;
+    private Label _mesLabel;
+    private Button _voltarMesButton;
+    private Button _avancarMesButton;
+
     public ProdutosPadraoPage(ProdutosPadraoViewModel viewModel)
     {
         _viewModel = viewModel;
         BindingContext = viewModel;
-        Title = "Lista de Compras";
         CreateUI();
         LoadProducts();
     }
@@ -39,14 +44,104 @@ public partial class ProdutosPadraoPage : ContentPage
         {
             RowDefinitions =
             {
-                new RowDefinition { Height = new GridLength(1, GridUnitType.Star) },
-                new RowDefinition { Height = GridLength.Auto }
+                new RowDefinition { Height = GridLength.Auto }, // Header com título
+                new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }, // Conteúdo principal
+                new RowDefinition { Height = GridLength.Auto } // Footer com totais
             }
         };
 
-        _scrollView = new ScrollView();
-        _mainStackLayout = new StackLayout { Padding = 20 };
+        // ===== HEADER SIMPLIFICADO (APENAS TÍTULO) =====
+        var tituloLabel = new Label
+        {
+            Text = "Lista de Compras",
+            FontSize = 20,
+            FontAttributes = FontAttributes.Bold,
+            TextColor = Colors.Black,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Start,
+            Margin = new Thickness(15, 10)
+        };
+        mainGrid.Children.Add(tituloLabel);
+        Grid.SetRow(tituloLabel, 0);
 
+
+        // ===== CONTEÚDO PRINCIPAL =====
+        _scrollView = new ScrollView();
+        _mainStackLayout = new StackLayout { Padding = new Thickness(15, 0, 15, 20) }; // Padding ajustado
+
+        // --- INÍCIO DA ALTERAÇÃO: NOVO GRID PARA OS BOTÕES LADO A LADO ---
+
+        var controlesSuperioresGrid = new Grid
+        {
+            ColumnDefinitions =
+            {
+                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
+                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }
+            },
+            Margin = new Thickness(0, 0, 0, 15) // Espaço abaixo dos botões
+        };
+
+        // 1. Seletor de Mês (agora na coluna 0)
+        var navegacaoMesStack = new StackLayout
+        {
+            Orientation = StackOrientation.Horizontal,
+            Spacing = 5,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Start // Alinhado à esquerda na sua coluna
+        };
+
+        _voltarMesButton = new Button
+        {
+            Text = "◀",
+            FontSize = 18,
+            BackgroundColor = Colors.White,
+            TextColor = Colors.Purple,
+            WidthRequest = 40,
+            HeightRequest = 40,
+            CornerRadius = 20,
+            Padding = 0,
+            BorderColor = Colors.Purple, // Estilo para destacar fora do fundo roxo
+            BorderWidth = 1
+        };
+        _voltarMesButton.Clicked += OnVoltarMesClicked;
+
+        _mesLabel = new Label
+        {
+            Text = ObterNomeMes(_mesAtual),
+            FontSize = 16,
+            FontAttributes = FontAttributes.Bold,
+            TextColor = Colors.Purple, // Cor ajustada para visibilidade
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Center,
+            MinimumWidthRequest = 100,
+            HorizontalTextAlignment = TextAlignment.Center
+        };
+
+        _avancarMesButton = new Button
+        {
+            Text = "▶",
+            FontSize = 18,
+            BackgroundColor = Colors.White,
+            TextColor = Colors.Purple,
+            WidthRequest = 40,
+            HeightRequest = 40,
+            CornerRadius = 20,
+            Padding = 0,
+            BorderColor = Colors.Purple, // Estilo para destacar fora do fundo roxo
+            BorderWidth = 1
+        };
+        _avancarMesButton.Clicked += OnAvancarMesClicked;
+
+        navegacaoMesStack.Children.Add(_voltarMesButton);
+        navegacaoMesStack.Children.Add(_mesLabel);
+        navegacaoMesStack.Children.Add(_avancarMesButton);
+
+        controlesSuperioresGrid.Children.Add(navegacaoMesStack);
+        Grid.SetColumn(navegacaoMesStack, 0);
+
+        AtualizarBotoesNavegacao(); // Chamada movida para cá
+
+        // 2. Botão "+ Novo Produto" (agora na coluna 1)
         var adicionarCategoriaButton = new Button
         {
             Text = "+ Novo produto",
@@ -55,15 +150,18 @@ public partial class ProdutosPadraoPage : ContentPage
             BackgroundColor = Colors.Purple,
             TextColor = Colors.White,
             CornerRadius = 8,
-            Margin = new Thickness(0, 0, 0, 0),
-            Padding = new Thickness(0, -1, 0, 0),
-            HeightRequest = 40,
-            WidthRequest = 140,
-            HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center
+            HeightRequest = 45,
+            HorizontalOptions = LayoutOptions.End // Alinhado à direita na sua coluna
         };
         adicionarCategoriaButton.Clicked += OnAdicionarCategoriaClicked;
-        _mainStackLayout.Children.Add(adicionarCategoriaButton);
+
+        controlesSuperioresGrid.Children.Add(adicionarCategoriaButton);
+        Grid.SetColumn(adicionarCategoriaButton, 1);
+
+        // Adiciona o Grid com os dois controles ao layout principal
+        _mainStackLayout.Children.Add(controlesSuperioresGrid);
+
+        // --- FIM DA ALTERAÇÃO ---
 
         var produtos = ProdutosPadraoService.ObterProdutosAtivos();
         var categorias = produtos.GroupBy(p => p.Categoria);
@@ -107,8 +205,9 @@ public partial class ProdutosPadraoPage : ContentPage
 
         _scrollView.Content = _mainStackLayout;
         mainGrid.Children.Add(_scrollView);
-        Grid.SetRow(_scrollView, 0);
+        Grid.SetRow(_scrollView, 1);
 
+        // ===== FOOTER COM TOTAIS =====
         var totaisFrame = new Frame
         {
             BackgroundColor = Colors.LightGray,
@@ -157,12 +256,48 @@ public partial class ProdutosPadraoPage : ContentPage
 
         totaisFrame.Content = totaisGrid;
         mainGrid.Children.Add(totaisFrame);
-        Grid.SetRow(totaisFrame, 1);
+        Grid.SetRow(totaisFrame, 2);
 
         Content = mainGrid;
 
         AtualizarTotalGeral();
         AtualizarTotalCheckados();
+    }
+
+    private string ObterNomeMes(DateTime data)
+    {
+        var cultura = new CultureInfo("pt-BR");
+        return cultura.TextInfo.ToTitleCase(data.ToString("MMMM/yyyy", cultura));
+    }
+
+    private void AtualizarBotoesNavegacao()
+    {
+        // Desabilita o botão de avançar se estiver no mês atual
+        var mesAtualReal = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        var mesSelecionado = new DateTime(_mesAtual.Year, _mesAtual.Month, 1);
+        
+        _avancarMesButton.IsEnabled = mesSelecionado < mesAtualReal;
+        _avancarMesButton.Opacity = _avancarMesButton.IsEnabled ? 1.0 : 0.5;
+    }
+
+    private void OnVoltarMesClicked(object sender, EventArgs e)
+    {
+        _mesAtual = _mesAtual.AddMonths(-1);
+        _mesLabel.Text = ObterNomeMes(_mesAtual);
+        AtualizarBotoesNavegacao();
+        
+        // Aqui você pode adicionar lógica para carregar dados do mês anterior
+        // Por exemplo: CarregarProdutosPorMes(_mesAtual);
+    }
+
+    private void OnAvancarMesClicked(object sender, EventArgs e)
+    {
+        _mesAtual = _mesAtual.AddMonths(1);
+        _mesLabel.Text = ObterNomeMes(_mesAtual);
+        AtualizarBotoesNavegacao();
+        
+        // Aqui você pode adicionar lógica para carregar dados do próximo mês
+        // Por exemplo: CarregarProdutosPorMes(_mesAtual);
     }
 
     private void CriarSecaoCategoria(Categoria categoria, List<(string Nome, UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio)> produtos)
@@ -553,7 +688,6 @@ public partial class ProdutosPadraoPage : ContentPage
 
     private async Task RemoverProdutoDinamicamente((string Nome, UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio) produto, View itemContainer, StackLayout containerStack)
     {
-        // Criar overlay de loading
         var loadingOverlay = new Grid
         {
             BackgroundColor = Color.FromArgb("#80000000"),
@@ -585,40 +719,32 @@ public partial class ProdutosPadraoPage : ContentPage
         if (mainGrid != null)
         {
             mainGrid.Children.Add(loadingOverlay);
-            Grid.SetRowSpan(loadingOverlay, 2);
+            Grid.SetRowSpan(loadingOverlay, 3);
         }
 
-        
-        // Executar exclusão no serviço
         bool sucesso = ProdutosPadraoService.ExcluirProdutoPadrao(produto.Nome);
 
         if (sucesso)
         {
-            // Remover overlay
             if (mainGrid != null)
             {
                 mainGrid.Children.Remove(loadingOverlay);
             }
 
-            // Animação de fade out
             await itemContainer.FadeTo(0, 200);
 
-            // Remover da UI
             containerStack.Children.Remove(itemContainer);
 
-            // Remover dos dicionários
             _produtoContainers.Remove(produto.Nome);
             _checkboxes.Remove(produto.Nome);
             _checkboxStates.Remove(produto.Nome);
             _quantidades.Remove(produto.Nome);
             _valoresUnitarios.Remove(produto.Nome);
 
-            // Verificar se a categoria ficou vazia
             if (containerStack.Children.Count == 0 && _categoriasUI.ContainsKey(produto.Categoria))
             {
                 var (categoriaLabel, _) = _categoriasUI[produto.Categoria];
 
-                // Animar e remover o label da categoria
                 await categoriaLabel.FadeTo(0, 200);
                 _mainStackLayout.Children.Remove(categoriaLabel);
                 _mainStackLayout.Children.Remove(containerStack);
@@ -626,13 +752,11 @@ public partial class ProdutosPadraoPage : ContentPage
                 _categoriasUI.Remove(produto.Categoria);
             }
 
-            // Atualizar totais
             AtualizarTotalGeral();
             AtualizarTotalCheckados();
         }
         else
         {
-            // Remover overlay em caso de erro
             if (mainGrid != null)
             {
                 mainGrid.Children.Remove(loadingOverlay);
@@ -1054,10 +1178,8 @@ public partial class ProdutosPadraoPage : ContentPage
 
             await Navigation.PopModalAsync();
 
-            // Adicionar produto dinamicamente sem reconstruir
             var novoProduto = (nomeProduto, unidadeProduto, categoria, iconeProduto, precoProduto);
 
-            // Verificar se a categoria já existe
             if (_categoriasUI.ContainsKey(categoria))
             {
                 var (_, produtosStackCategoria) = _categoriasUI[categoria];
@@ -1065,7 +1187,6 @@ public partial class ProdutosPadraoPage : ContentPage
             }
             else
             {
-                // Criar nova seção de categoria
                 CriarSecaoCategoria(categoria, new List<(string, UnidadeMedida, Categoria, string, decimal)> { novoProduto });
             }
 
