@@ -7,28 +7,16 @@
       "RelativeMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|solutionrelative:listacomprasapp\\views\\produtospadraopage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|c:\\users\\reina\\onedrive\\ti\\listamercado\\listacomprasapp\\listacomprasapp\\models\\totaismanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|solutionrelative:listacomprasapp\\models\\totaismanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|c:\\users\\reina\\onedrive\\ti\\listamercado\\listacomprasapp\\listacomprasapp\\viewmodels\\listadetalhesviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|solutionrelative:listacomprasapp\\viewmodels\\listadetalhesviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|c:\\users\\reina\\onedrive\\ti\\listamercado\\listacomprasapp\\listacomprasapp\\services\\produtospadraoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|solutionrelative:listacomprasapp\\services\\produtospadraoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|c:\\users\\reina\\onedrive\\ti\\listamercado\\listacomprasapp\\listacomprasapp\\services\\historicomensal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|solutionrelative:listacomprasapp\\services\\historicomensal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|c:\\users\\reina\\onedrive\\ti\\listamercado\\listacomprasapp\\listacomprasapp\\services\\produtospersonalizadosservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|solutionrelative:listacomprasapp\\services\\produtospersonalizadosservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|c:\\users\\reina\\onedrive\\ti\\listamercado\\listacomprasapp\\listacomprasapp\\models\\historicopreco.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|solutionrelative:listacomprasapp\\models\\historicopreco.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|c:\\users\\reina\\onedrive\\ti\\listamercado\\listacomprasapp\\listacomprasapp\\models\\item.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|solutionrelative:listacomprasapp\\models\\item.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|c:\\users\\reina\\onedrive\\ti\\listamercado\\listacomprasapp\\listacomprasapp\\models\\listacompras.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|solutionrelative:listacomprasapp\\models\\listacompras.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|c:\\users\\reina\\onedrive\\ti\\listamercado\\listacomprasapp\\listacomprasapp\\services\\historicocomprasservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{908AE938-8823-4B58-B58F-89003BA79D73}|ListaComprasApp\\ListaComprasApp.csproj|solutionrelative:listacomprasapp\\services\\historicocomprasservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -48,33 +36,19 @@
         },
         {
           "DockedHeight": 173,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ProdutosPadraoService.cs",
-              "DocumentMoniker": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Services\\ProdutosPadraoService.cs",
-              "RelativeDocumentMoniker": "ListaComprasApp\\Services\\ProdutosPadraoService.cs",
-              "ToolTip": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Services\\ProdutosPadraoService.cs",
-              "RelativeToolTip": "ListaComprasApp\\Services\\ProdutosPadraoService.cs",
-              "ViewState": "AgIAAKAAAAAAAAAAAAAcwLcAAAABAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "ListaDetalhesViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\ViewModels\\ListaDetalhesViewModel.cs",
+              "RelativeDocumentMoniker": "ListaComprasApp\\ViewModels\\ListaDetalhesViewModel.cs",
+              "ToolTip": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\ViewModels\\ListaDetalhesViewModel.cs",
+              "RelativeToolTip": "ListaComprasApp\\ViewModels\\ListaDetalhesViewModel.cs",
+              "ViewState": "AgIAAN4AAAAAAAAAAAAMwOoAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-07T14:43:25.788Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "ProdutosPersonalizadosService.cs",
-              "DocumentMoniker": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Services\\ProdutosPersonalizadosService.cs",
-              "RelativeDocumentMoniker": "ListaComprasApp\\Services\\ProdutosPersonalizadosService.cs",
-              "ToolTip": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Services\\ProdutosPersonalizadosService.cs",
-              "RelativeToolTip": "ListaComprasApp\\Services\\ProdutosPersonalizadosService.cs",
-              "ViewState": "AgIAAMgAAAAAAAAAAAAcwN8AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-07T14:43:11.579Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-08T23:12:18.159Z"
             },
             {
               "$type": "Document",
@@ -84,61 +58,35 @@
               "RelativeDocumentMoniker": "ListaComprasApp\\Views\\ProdutosPadraoPage.xaml.cs",
               "ToolTip": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Views\\ProdutosPadraoPage.xaml.cs",
               "RelativeToolTip": "ListaComprasApp\\Views\\ProdutosPadraoPage.xaml.cs",
-              "ViewState": "AgIAAPMDAAAAAAAAAAAAwAgEAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAACoHAAAAAAAAAAAAwDsHAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-09-15T22:22:34.264Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "TotaisManager.cs",
-              "DocumentMoniker": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Models\\TotaisManager.cs",
-              "RelativeDocumentMoniker": "ListaComprasApp\\Models\\TotaisManager.cs",
-              "ToolTip": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Models\\TotaisManager.cs",
-              "RelativeToolTip": "ListaComprasApp\\Models\\TotaisManager.cs",
-              "ViewState": "AgIAAD8AAAAAAAAAAAAcwFYAAAABAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "HistoricoMensal.cs",
+              "DocumentMoniker": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Services\\HistoricoMensal.cs",
+              "RelativeDocumentMoniker": "ListaComprasApp\\Services\\HistoricoMensal.cs",
+              "ToolTip": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Services\\HistoricoMensal.cs",
+              "RelativeToolTip": "ListaComprasApp\\Services\\HistoricoMensal.cs",
+              "ViewState": "AgIAAHcAAAAAAAAAAAA3wIcAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-07T14:44:23.993Z",
+              "WhenOpened": "2025-10-07T21:28:36.689Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "HistoricoPreco.cs",
-              "DocumentMoniker": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Models\\HistoricoPreco.cs",
-              "RelativeDocumentMoniker": "ListaComprasApp\\Models\\HistoricoPreco.cs",
-              "ToolTip": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Models\\HistoricoPreco.cs",
-              "RelativeToolTip": "ListaComprasApp\\Models\\HistoricoPreco.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAUwAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-07T14:21:37.105Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Item.cs",
-              "DocumentMoniker": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Models\\Item.cs",
-              "RelativeDocumentMoniker": "ListaComprasApp\\Models\\Item.cs",
-              "ToolTip": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Models\\Item.cs",
-              "RelativeToolTip": "ListaComprasApp\\Models\\Item.cs",
+              "DocumentIndex": 3,
+              "Title": "HistoricoComprasService.cs",
+              "DocumentMoniker": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Services\\HistoricoComprasService.cs",
+              "RelativeDocumentMoniker": "ListaComprasApp\\Services\\HistoricoComprasService.cs",
+              "ToolTip": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Services\\HistoricoComprasService.cs",
+              "RelativeToolTip": "ListaComprasApp\\Services\\HistoricoComprasService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-07T14:21:34.858Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "ListaCompras.cs",
-              "DocumentMoniker": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Models\\ListaCompras.cs",
-              "RelativeDocumentMoniker": "ListaComprasApp\\Models\\ListaCompras.cs",
-              "ToolTip": "C:\\Users\\reina\\OneDrive\\TI\\ListaMercado\\ListaComprasApp\\ListaComprasApp\\Models\\ListaCompras.cs",
-              "RelativeToolTip": "ListaComprasApp\\Models\\ListaCompras.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-07T14:21:29.888Z",
+              "WhenOpened": "2025-10-07T15:14:20.304Z",
               "EditorCaption": ""
             }
           ]
