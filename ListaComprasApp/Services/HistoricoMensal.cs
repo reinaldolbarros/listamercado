@@ -80,6 +80,7 @@ namespace ListaComprasApp.Services
             Preferences.Set(PREF_KEY, json);
         }
 
+        // Para finalizar compra (soma quantidades)
         public static void AdicionarItem(DateTime data, string nome, int quantidade, decimal valor)
         {
             string chave = $"{data.Year}-{data.Month}";
@@ -102,6 +103,20 @@ namespace ListaComprasApp.Services
             SalvarHistorico();
         }
 
+        // Para editar meses passados (substitui valores)
+        public static void SalvarItem(DateTime data, string nome, int quantidade, decimal valor)
+        {
+            string chave = $"{data.Year}-{data.Month}";
+
+            if (!_historico.ContainsKey(chave))
+            {
+                _historico[chave] = new Dictionary<string, (int, decimal)>();
+            }
+
+            _historico[chave][nome] = (quantidade, valor);
+            SalvarHistorico();
+        }
+
         public static Dictionary<string, (int Quantidade, decimal Valor)> ObterHistoricoMes(DateTime data)
         {
             string chave = $"{data.Year}-{data.Month}";
@@ -112,6 +127,23 @@ namespace ListaComprasApp.Services
             }
 
             return new Dictionary<string, (int, decimal)>();
+        }
+
+        public static void RemoverItem(DateTime data, string nome)
+        {
+            string chave = $"{data.Year}-{data.Month}";
+
+            if (_historico.ContainsKey(chave) && _historico[chave].ContainsKey(nome))
+            {
+                _historico[chave].Remove(nome);
+
+                if (_historico[chave].Count == 0)
+                {
+                    _historico.Remove(chave);
+                }
+
+                SalvarHistorico();
+            }
         }
 
         // Classes auxiliares para serialização

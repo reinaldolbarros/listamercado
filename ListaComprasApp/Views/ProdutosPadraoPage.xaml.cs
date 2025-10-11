@@ -3,6 +3,7 @@ using ListaComprasApp.Services;
 using ListaComprasApp.Models;
 using System.Globalization;
 
+
 namespace ListaComprasApp.Views;
 
 public partial class ProdutosPadraoPage : ContentPage
@@ -114,7 +115,29 @@ public partial class ProdutosPadraoPage : ContentPage
             MinimumWidthRequest = 100,
             HorizontalTextAlignment = TextAlignment.Center
         };
+        // Criar label de indicador de modo
+        var _modoLabel = new Label
+        {
+            Text = "",
+            FontSize = 11,
+            FontAttributes = FontAttributes.Bold,
+            TextColor = Color.FromArgb("#FF6B6B"),
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Center,
+            IsVisible = false
+        };
+        navegacaoMesStack.Children.Add(_modoLabel);
 
+        // Atualizar no método AtualizarBotoesNavegacao():
+        if (EhMesPassado(_mesAtual))
+        {
+            _modoLabel.Text = "📋 MODO VISUALIZAÇÃO";
+            _modoLabel.IsVisible = true;
+        }
+        else
+        {
+            _modoLabel.IsVisible = false;
+        }
         _avancarMesButton = new Button
         {
             Text = "▶",
@@ -281,12 +304,168 @@ public partial class ProdutosPadraoPage : ContentPage
         // Recarregar a lista com os dados do mês selecionado
         CarregarDadosDoMes();
     }
+    /// <summary>
+    /// Verifica se o mês atual é um mês passado (já finalizado)
+    /// </summary>
+    private bool EhMesPassado(DateTime mes)
+    {
+        var mesAtualReal = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        var mesSelecionado = new DateTime(mes.Year, mes.Month, 1);
+
+        return mesSelecionado < mesAtualReal;
+    }
+
+    // ========== MÉTODO 3: ADICIONAR (novo método) ==========
+
+    // Substitua o método ReconstruirListaProdutos:
+
+    private void DesabilitarBotoesQuantidade()
+    {
+        foreach (var container in _produtoContainers.Values)
+        {
+            // Percorrer hierarquia para encontrar os botões
+            if (container is Grid grid)
+            {
+                foreach (var child in grid.Children)
+                {
+                    if (child is Frame frame && frame.Content is Grid itemGrid)
+                    {
+                        foreach (var itemChild in itemGrid.Children)
+                        {
+                            if (itemChild is StackLayout stackLayout)
+                            {
+                                DesabilitarBotoesRecursivo(stackLayout);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    /// <summary>
+    /// Desabilita botões recursivamente em uma StackLayout
+    /// </summary>
+    private void DesabilitarBotoesRecursivo(StackLayout stack)
+    {
+        foreach (var child in stack.Children)
+        {
+            if (child is Button button)
+            {
+                button.IsEnabled = false;
+                button.Opacity = 0.5;
+            }
+            else if (child is StackLayout innerStack)
+            {
+                DesabilitarBotoesRecursivo(innerStack);
+            }
+        }
+    }
+
+    // ========== MÉTODO 4: ADICIONAR (novo método auxiliar) ==========
+
+    /// <summary>
+    /// Limpa todas as categorias da interface
+    /// </summary>
+    private void LimparTodasCategorias()
+    {
+        if (_mainStackLayout == null) return;
+
+        // REMOVER TUDO exceto os controles superiores e botão finalizar
+        var itensParaRemover = new List<IView>();
+
+        // Percorrer todos os children e marcar para remoção
+        // (exceto o primeiro item que são os controles superiores)
+        for (int i = 1; i < _mainStackLayout.Children.Count; i++)
+        {
+            var child = _mainStackLayout.Children[i];
+
+            // Não remover o botão "Finalizar Compra" (último item)
+            bool ehBotaoFinalizar = child is StackLayout stack &&
+                                    stack.Children.Any(c => c is Button btn &&
+                                    btn.Text != null && btn.Text.Contains("Finalizar"));
+
+            if (!ehBotaoFinalizar)
+            {
+                itensParaRemover.Add(child);
+            }
+        }
+
+        // Remover todos os itens marcados
+        foreach (var item in itensParaRemover)
+        {
+            _mainStackLayout.Children.Remove(item);
+        }
+
+        // Limpar dicionários
+        _categoriasUI?.Clear();
+        _produtoContainers?.Clear();
+        _produtoFrames?.Clear();
+        _produtoGrids?.Clear();
+        _checkboxes?.Clear();
+        _quantidades?.Clear();
+        _valoresUnitarios?.Clear();
+    }
+    /// <summary>
+    /// Exibe mensagem quando não há compras no mês
+    /// </summary>
+    private void ExibirMensagemMesVazio()
+    {
+        var mensagemFrame = new Frame
+        {
+            BackgroundColor = Color.FromArgb("#FFF8E1"),
+            BorderColor = Color.FromArgb("#FFD54F"),
+            CornerRadius = 12,
+            Padding = new Thickness(30, 20),
+            Margin = new Thickness(15, 50, 15, 0),
+            HasShadow = false
+        };
+
+        var stack = new StackLayout
+        {
+            Spacing = 10,
+            HorizontalOptions = LayoutOptions.Center
+        };
+
+        var iconeLabel = new Label
+        {
+            Text = "📋",
+            FontSize = 48,
+            HorizontalOptions = LayoutOptions.Center
+        };
+        stack.Children.Add(iconeLabel);
+
+        var tituloLabel = new Label
+        {
+            Text = "Nenhuma compra realizada",
+            FontSize = 18,
+            FontAttributes = FontAttributes.Bold,
+            HorizontalTextAlignment = TextAlignment.Center,
+            TextColor = Color.FromArgb("#F57C00")
+        };
+        stack.Children.Add(tituloLabel);
+
+        var cultura = new CultureInfo("pt-BR");
+        var nomeMes = cultura.TextInfo.ToTitleCase(_mesAtual.ToString("MMMM/yyyy", cultura));
+
+        var mensagemLabel = new Label
+        {
+            Text = $"Não há registros de compras em {nomeMes}",
+            FontSize = 14,
+            HorizontalTextAlignment = TextAlignment.Center,
+            TextColor = Colors.Gray
+        };
+        stack.Children.Add(mensagemLabel);
+
+        mensagemFrame.Content = stack;
+        _mainStackLayout.Children.Add(mensagemFrame);
+    }
+    // Substitua o método CarregarDadosDoMes COMPLETO:
+    // 1. Substitua CarregarDadosDoMes:
 
     private void CarregarDadosDoMes()
     {
         var mesPrimeiroDia = new DateTime(_mesAtual.Year, _mesAtual.Month, 1);
 
-        // Garantir que existe um dicionário para este mês
         if (!_checkboxStatesPorMes.ContainsKey(mesPrimeiroDia))
         {
             _checkboxStatesPorMes[mesPrimeiroDia] = new Dictionary<string, bool>();
@@ -296,59 +475,99 @@ public partial class ProdutosPadraoPage : ContentPage
             _quantidadesPorMes[mesPrimeiroDia] = new Dictionary<string, int>();
         }
 
-        // Atualizar os checkboxes e quantidades para refletir o mês atual
-        foreach (var kvp in _checkboxes)
+        bool ehMesPassado = EhMesPassado(_mesAtual);
+
+        if (ehMesPassado)
         {
-            var nomeProduto = kvp.Key;
-            var checkbox = kvp.Value;
-
-            // Remover handler temporariamente
-            checkbox.CheckedChanged -= CheckboxChangedHandler;
-
-            // Carregar estado do checkbox deste mês
-            if (_checkboxStatesPorMes[mesPrimeiroDia].ContainsKey(nomeProduto))
-            {
-                checkbox.IsChecked = _checkboxStatesPorMes[mesPrimeiroDia][nomeProduto];
-            }
-            else
-            {
-                checkbox.IsChecked = false;
-                _checkboxStatesPorMes[mesPrimeiroDia][nomeProduto] = false;
-            }
-
-            // Aplicar ou remover estilo visual
-            if (checkbox.IsChecked)
-            {
-                AplicarEstiloComprado(nomeProduto);
-            }
-            else
-            {
-                RemoverEstiloComprado(nomeProduto);
-            }
-
-            // Adicionar handler de volta
-            checkbox.CheckedChanged += CheckboxChangedHandler;
-
-            // Carregar quantidade deste mês
-            if (_quantidadesPorMes[mesPrimeiroDia].ContainsKey(nomeProduto))
-            {
-                _quantidades[nomeProduto] = _quantidadesPorMes[mesPrimeiroDia][nomeProduto];
-            }
-            else
-            {
-                _quantidades[nomeProduto] = 1;
-                _quantidadesPorMes[mesPrimeiroDia][nomeProduto] = 1;
-            }
+            ReconstruirListaProdutos(mesPrimeiroDia);
+        }
+        else
+        {
+            // MÊS ATUAL: Recarregar tudo
+            _ = Task.Run(async () => await RecarregarProdutos());
         }
 
-        // Reordenar produtos baseado nos checkboxes do mês
-        ReordenarProdutosPorEstado();
-
-        // Atualizar totais
         AtualizarTotalGeral();
         AtualizarTotalCheckados();
     }
 
+    // 2. Adicione ReconstruirListaProdutos:
+
+    private void ReconstruirListaProdutos(DateTime mesPrimeiroDia)
+    {
+        try
+        {
+            if (_mainStackLayout == null) return;
+
+            var historicoMes = HistoricoMensal.ObterHistoricoMes(_mesAtual);
+
+            LimparTodasCategorias();
+
+            // Se não há histórico, mostrar mensagem e SAIR
+            if (historicoMes == null || historicoMes.Count == 0)
+            {
+                ExibirMensagemMesVazio();
+                return; // ← SAIR AQUI, não continuar
+            }
+
+            var todosProdutos = ProdutosPadraoService.ObterProdutosAtivos();
+            if (todosProdutos == null) return;
+
+            var produtosComprados = todosProdutos.Where(p => historicoMes.ContainsKey(p.Nome)).ToList();
+
+            // Se não há produtos comprados, mostrar mensagem e SAIR
+            if (produtosComprados.Count == 0)
+            {
+                ExibirMensagemMesVazio();
+                return; // ← SAIR AQUI, não continuar
+            }
+
+            // APENAS SE CHEGOU AQUI (tem produtos): criar as categorias
+            var categorias = produtosComprados.GroupBy(p => p.Categoria);
+
+            foreach (var categoria in categorias)
+            {
+                CriarSecaoCategoria(categoria.Key, categoria.ToList());
+            }
+
+            // Resto do código...
+            foreach (var kvp in _checkboxes.ToList())
+            {
+                if (kvp.Value != null)
+                {
+                    kvp.Value.IsChecked = false;
+                    kvp.Value.IsEnabled = false;
+                }
+            }
+
+            foreach (var produto in produtosComprados)
+            {
+                if (historicoMes.ContainsKey(produto.Nome))
+                {
+                    var (quantidade, valor) = historicoMes[produto.Nome];
+
+                    if (_quantidades != null)
+                        _quantidades[produto.Nome] = quantidade;
+
+                    if (_valoresUnitarios != null && _valoresUnitarios.ContainsKey(produto.Nome))
+                    {
+                        var entry = _valoresUnitarios[produto.Nome];
+                        if (entry != null)
+                        {
+                            entry.Text = valor.ToString("N2", CultureInfo.GetCultureInfo("pt-BR"));
+                            entry.IsEnabled = false;
+                        }
+                    }
+                }
+            }
+
+            DesabilitarBotoesQuantidade();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Erro em ReconstruirListaProdutos: {ex.Message}");
+        }
+    }
     private void ReordenarProdutosPorEstado()
     {
         foreach (var categoriaUI in _categoriasUI)
@@ -402,10 +621,29 @@ public partial class ProdutosPadraoPage : ContentPage
             TextColor = Colors.Purple,
             Margin = new Thickness(0, 15, 0, 5)
         };
-        _mainStackLayout.Children.Add(categoriaLabel);
 
         var produtosStack = new StackLayout { Spacing = 2 };
-        _mainStackLayout.Children.Add(produtosStack);
+
+        // Encontrar posição correta (após controles superiores e antes do botão finalizar)
+        int posicaoInserir = 1; // Após os controles superiores
+
+        // Contar quantas categorias já existem
+        foreach (var cat in _categoriasUI.Values)
+        {
+            posicaoInserir += 2; // Label + Stack de cada categoria
+        }
+
+        // Inserir na posição correta em vez de Add
+        if (posicaoInserir < _mainStackLayout.Children.Count)
+        {
+            _mainStackLayout.Children.Insert(posicaoInserir, categoriaLabel);
+            _mainStackLayout.Children.Insert(posicaoInserir + 1, produtosStack);
+        }
+        else
+        {
+            _mainStackLayout.Children.Add(categoriaLabel);
+            _mainStackLayout.Children.Add(produtosStack);
+        }
 
         _categoriasUI[categoria] = (categoriaLabel, produtosStack);
 
@@ -414,7 +652,6 @@ public partial class ProdutosPadraoPage : ContentPage
             AdicionarProdutoNaUI(produto, produtosStack);
         }
     }
-
     private void AdicionarProdutoNaUI((string Nome, UnidadeMedida Unidade, Categoria Categoria, string Icone, decimal PrecoMedio) produto, StackLayout containerStack)
     {
         var itemContainer = new Grid
@@ -1103,45 +1340,35 @@ public partial class ProdutosPadraoPage : ContentPage
 
     private async Task RecarregarProdutos()
     {
-        foreach (var container in _produtoContainers.Values.ToList())
+        await Device.InvokeOnMainThreadAsync(() =>
         {
-            var stackLayout = container.Parent as StackLayout;
-            if (stackLayout != null)
+            try
             {
-                stackLayout.Children.Remove(container);
+                if (_mainStackLayout == null) return;
+
+                LimparTodasCategorias();
+
+                var produtos = ProdutosPadraoService.ObterProdutosAtivos();
+
+                if (produtos == null || !produtos.Any()) return;
+
+                var categorias = produtos.GroupBy(p => p.Categoria);
+
+                foreach (var categoria in categorias)
+                {
+                    if (categoria == null || !categoria.Any()) continue;
+                    CriarSecaoCategoria(categoria.Key, categoria.ToList());
+                }
+
+                AtualizarTotalGeral();
+                AtualizarTotalCheckados();
             }
-        }
-
-        _produtoContainers.Clear();
-        _produtoFrames.Clear();
-        _produtoGrids.Clear();
-        _checkboxes.Clear();
-        _quantidades.Clear();
-        _valoresUnitarios.Clear();
-
-        foreach (var categoriaUI in _categoriasUI.Values.ToList())
-        {
-            _mainStackLayout.Children.Remove(categoriaUI.CategoriaLabel);
-            _mainStackLayout.Children.Remove(categoriaUI.ProdutosStack);
-        }
-
-        _categoriasUI.Clear();
-
-        var produtos = ProdutosPadraoService.ObterProdutosAtivos();
-        var categorias = produtos.GroupBy(p => p.Categoria);
-
-        foreach (var categoria in categorias)
-        {
-            CriarSecaoCategoria(categoria.Key, categoria.ToList());
-        }
-
-        // Recarregar dados do mês atual após recriar a UI
-        CarregarDadosDoMes();
-
-        AtualizarTotalGeral();
-        AtualizarTotalCheckados();
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erro em RecarregarProdutos: {ex.Message}");
+            }
+        });
     }
-
     private void AtualizarTotalGeral()
     {
         Dictionary<string, decimal> valoresUnitarios = new Dictionary<string, decimal>();
@@ -1208,17 +1435,14 @@ public partial class ProdutosPadraoPage : ContentPage
         }
 
         var result = await DisplayAlert("Finalizar Compra",
-            "Deseja finalizar esta lista de compras? Os produtos marcados serão acumulados no histórico do mês.",
+            $"Deseja finalizar esta lista de compras para {ObterNomeMes(_mesAtual)}? Os produtos marcados serão acumulados no histórico.",
             "Sim", "Não");
 
         if (result)
         {
             int produtosFinalizados = 0;
-
-            // Criar lista de produtos marcados para processar
             var produtosMarcados = new List<string>();
 
-            // Coletar informações dos produtos marcados
             foreach (var kvp in _checkboxes.ToList())
             {
                 if (kvp.Value.IsChecked)
@@ -1227,145 +1451,34 @@ public partial class ProdutosPadraoPage : ContentPage
                 }
             }
 
-            // Processar cada produto marcado
             foreach (var nomeProduto in produtosMarcados)
             {
                 produtosFinalizados++;
 
-                // Obter a quantidade
-                int quantidade = 1;
-                if (_quantidades.ContainsKey(nomeProduto))
-                {
-                    quantidade = _quantidades[nomeProduto];
-                }
-
-                // Obter o valor unitário
+                int quantidade = _quantidades.ContainsKey(nomeProduto) ? _quantidades[nomeProduto] : 1;
                 decimal valorUnitario = 0;
+
                 if (_valoresUnitarios.ContainsKey(nomeProduto))
                 {
                     Entry entry = _valoresUnitarios[nomeProduto];
                     decimal.TryParse(entry.Text, out valorUnitario);
                 }
 
-                // Adicionar/acumular no histórico do mês atual
+                // IMPORTANTE: Salvar no histórico do MÊS SELECIONADO
                 HistoricoMensal.AdicionarItem(_mesAtual, nomeProduto, quantidade, valorUnitario);
 
-                // Remover estilo visual manualmente
-                RemoverEstiloComprado(nomeProduto);
-
-                // Desmarcar o checkbox SEM disparar eventos
-                if (_checkboxes.ContainsKey(nomeProduto))
-                {
-                    var checkbox = _checkboxes[nomeProduto];
-
-                    // Remover temporariamente o handler
-                    checkbox.CheckedChanged -= CheckboxChangedHandler;
-                    checkbox.IsChecked = false;
-
-                    // Atualizar estado do checkbox no mês atual
-                    var mesPrimeiroDia = new DateTime(_mesAtual.Year, _mesAtual.Month, 1);
-                    if (!_checkboxStatesPorMes.ContainsKey(mesPrimeiroDia))
-                    {
-                        _checkboxStatesPorMes[mesPrimeiroDia] = new Dictionary<string, bool>();
-                    }
-                    _checkboxStatesPorMes[mesPrimeiroDia][nomeProduto] = false;
-
-                    // Adicionar o handler de volta
-                    checkbox.CheckedChanged += CheckboxChangedHandler;
-                }
-
-                // Resetar a quantidade para 1
-                if (_quantidades.ContainsKey(nomeProduto))
-                {
-                    _quantidades[nomeProduto] = 1;
-
-                    // Salvar quantidade no mês atual
-                    var mesAtualPrimeiroDia = new DateTime(_mesAtual.Year, _mesAtual.Month, 1);
-                    if (!_quantidadesPorMes.ContainsKey(mesAtualPrimeiroDia))
-                    {
-                        _quantidadesPorMes[mesAtualPrimeiroDia] = new Dictionary<string, int>();
-                    }
-                    _quantidadesPorMes[mesAtualPrimeiroDia][nomeProduto] = 1;
-                }
-            }
-
-            // Reordenar produtos manualmente após finalizar tudo
-            foreach (var nomeProduto in produtosMarcados)
-            {
-                var produtoInfo = ProdutosPadraoService.ObterProdutosAtivos()
-                    .FirstOrDefault(p => p.Nome == nomeProduto);
-
-                if (produtoInfo.Nome != null && _produtoContainers.ContainsKey(nomeProduto) && _categoriasUI.ContainsKey(produtoInfo.Categoria))
-                {
-                    var produtoContainer = _produtoContainers[nomeProduto];
-                    var (_, produtosStack) = _categoriasUI[produtoInfo.Categoria];
-
-                    // Encontrar posição no início (antes de qualquer produto marcado)
-                    int posicaoInserir = 0;
-                    bool encontrouPosicao = false;
-
-                    for (int i = 0; i < produtosStack.Children.Count; i++)
-                    {
-                        var child = produtosStack.Children[i];
-                        bool isChildMarcado = false;
-
-                        // Verificar se este child é um produto marcado
-                        foreach (var kvp in _produtoContainers)
-                        {
-                            if (kvp.Value == child && _checkboxes.ContainsKey(kvp.Key) && _checkboxes[kvp.Key].IsChecked)
-                            {
-                                isChildMarcado = true;
-                                break;
-                            }
-                        }
-
-                        if (isChildMarcado)
-                        {
-                            posicaoInserir = i;
-                            encontrouPosicao = true;
-                            break;
-                        }
-                    }
-
-                    if (!encontrouPosicao)
-                    {
-                        posicaoInserir = produtosStack.Children.Count;
-                    }
-
-                    // Remover da posição atual
-                    int currentIndex = produtosStack.Children.IndexOf(produtoContainer);
-                    if (currentIndex >= 0)
-                    {
-                        produtosStack.Children.RemoveAt(currentIndex);
-
-                        // Ajustar posição se necessário
-                        if (currentIndex < posicaoInserir)
-                        {
-                            posicaoInserir--;
-                        }
-
-                        // Inserir na nova posição
-                        if (posicaoInserir >= produtosStack.Children.Count)
-                        {
-                            produtosStack.Children.Add(produtoContainer);
-                        }
-                        else
-                        {
-                            produtosStack.Children.Insert(posicaoInserir, produtoContainer);
-                        }
-                    }
-                }
+                // DEBUG - ver se salvou
+                System.Diagnostics.Debug.WriteLine($"Salvou: {nomeProduto} em {_mesAtual:yyyy-MM}");
             }
 
             await DisplayAlert("Sucesso",
-                $"Compra finalizada! {produtosFinalizados} produto(s) foram acumulados no histórico de {ObterNomeMes(_mesAtual)}.",
+                $"Compra finalizada! {produtosFinalizados} produto(s) foram salvos no histórico de {ObterNomeMes(_mesAtual)}.",
                 "OK");
 
-            // Atualizar a interface
-            AtualizarTotalCheckados();
+            // RECARREGAR para mostrar os produtos salvos
+            CarregarDadosDoMes();
         }
     }
-
     // Método auxiliar para atualizar o label de quantidade
     private void AtualizarQuantidadeLabel(StackLayout stack, int novaQuantidade)
     {

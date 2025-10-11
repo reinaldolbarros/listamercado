@@ -4,6 +4,26 @@
         <name>ListaComprasApp</name>
     </assembly>
     <members>
+        <member name="M:ListaComprasApp.Views.ProdutosPadraoPage.EhMesPassado(System.DateTime)">
+            <summary>
+            Verifica se o mês atual é um mês passado (já finalizado)
+            </summary>
+        </member>
+        <member name="M:ListaComprasApp.Views.ProdutosPadraoPage.DesabilitarBotoesRecursivo(Microsoft.Maui.Controls.StackLayout)">
+            <summary>
+            Desabilita botões recursivamente em uma StackLayout
+            </summary>
+        </member>
+        <member name="M:ListaComprasApp.Views.ProdutosPadraoPage.LimparTodasCategorias">
+            <summary>
+            Limpa todas as categorias da interface
+            </summary>
+        </member>
+        <member name="M:ListaComprasApp.Views.ProdutosPadraoPage.ExibirMensagemMesVazio">
+            <summary>
+            Exibe mensagem quando não há compras no mês
+            </summary>
+        </member>
         <member name="T:ListaComprasApp.ViewModels.BaseViewModel">
             <inheritdoc/>
         </member>
