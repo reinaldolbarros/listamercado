@@ -18,13 +18,12 @@
         CafesChas,               // NOVO
         BebeInfantil,            // NOVO
         PetShop,                 // NOVO
-        UtilidadesDomesticas,    // NOVO
         Descartaveis,            // NOVO
         HortifrutiEspeciais,     // NOVO
         ComidasProntas,          // NOVO
         Farmacia,                // NOVO
         FestasDecoracao,         // NOVO
-        UtilidadesDomestivas,
+        UtilidadesDomesticas,
         ListaGeral
     }
 }

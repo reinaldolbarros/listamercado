@@ -18,7 +18,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ListaComprasApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+a7c46f77a26f3bad0aed93ac0e2ec5ef7923d184")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+5690c69006128caeee16ccb2e6a86aafa92bc769")]
 [assembly: System.Reflection.AssemblyProductAttribute("ListaComprasApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ListaComprasApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
